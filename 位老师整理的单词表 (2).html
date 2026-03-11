@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PET词汇闪卡 - 完整版</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f0f9ff;
+            color: #0c4a6e;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #38bdf8;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #0369a1;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #0284c7;
+            margin-bottom: 20px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background-color: #e0f2fe;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            font-weight: bold;
+        }
+        
+        .card-container {
+            perspective: 1000px;
+            margin: 30px auto;
+            width: 100%;
+            height: 380px;
+            max-width: 550px;
+        }
+        
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(3, 105, 161, 0.15);
+            cursor: pointer;
+        }
+        
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .card-front {
+            background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 100%);
+            color: #0c4a6e;
+        }
+        
+        .card-back {
+            background: linear-gradient(135deg, #bae6fd 0%, #7dd3fc 100%);
+            color: #0c4a6e;
+            transform: rotateY(180deg);
+            overflow-y: auto;
+        }
+        
+        .word {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+            word-break: break-word;
+            max-width: 100%;
+        }
+        
+        .phonetic {
+            font-size: 1.3rem;
+            color: #0369a1;
+            margin-bottom: 10px;
+            font-family: 'Arial', sans-serif;
+            background-color: rgba(255, 255, 255, 0.6);
+            padding: 5px 15px;
+            border-radius: 10px;
+        }
+        
+        .meaning {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #0369a1;
+        }
+        
+        .example {
+            font-size: 1.1rem;
+            font-style: italic;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            width: 100%;
+        }
+        
+        .example-en {
+            margin-bottom: 10px;
+        }
+        
+        .example-cn {
+            color: #475569;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            background-color: #0ea5e9;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(14, 165, 233, 0.3);
+        }
+        
+        .btn:hover {
+            background-color: #0284c7;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(14, 165, 233, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+        
+        .favorite-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: #f43f5e;
+            cursor: pointer;
+            transition: transform 0.3s;
+            z-index: 10;
+        }
+        
+        .favorite-btn:hover {
+            transform: scale(1.2);
+        }
+        
+        .favorite-btn.active {
+            color: #e11d48;
+        }
+        
+        .pronounce-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: #0c4a6e;
+            cursor: pointer;
+            z-index: 10;
+        }
+        
+        .pronounce-btn:hover {
+            color: #0369a1;
+        }
+        
+        .card-number {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 1rem;
+            color: #0c4a6e;
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background-color: #f0f9ff;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #38bdf8;
+        }
+        
+        .modal-title {
+            font-size: 1.8rem;
+            color: #0369a1;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: #0369a1;
+            cursor: pointer;
+        }
+        
+        .favorites-list {
+            list-style-type: none;
+        }
+        
+        .favorite-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #e0f2fe;
+            border-radius: 10px;
+            transition: background-color 0.3s;
+        }
+        
+        .favorite-item:hover {
+            background-color: #bae6fd;
+        }
+        
+        .favorite-word {
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: #0369a1;
+        }
+        
+        .favorite-meaning {
+            color: #0c4a6e;
+            margin-top: 5px;
+        }
+        
+        .remove-btn {
+            background-color: #f43f5e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .remove-btn:hover {
+            background-color: #e11d48;
+        }
+        
+        .search-box {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .search-input {
+            padding: 10px 20px;
+            width: 100%;
+            max-width: 400px;
+            border: 2px solid #38bdf8;
+            border-radius: 50px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .search-input:focus {
+            border-color: #0369a1;
+        }
+        
+        .category-filter {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .category-btn {
+            padding: 8px 15px;
+            background-color: #e0f2fe;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .category-btn:hover {
+            background-color: #bae6fd;
+        }
+        
+        .category-btn.active {
+            background-color: #0ea5e9;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .card-container {
+                height: 350px;
+            }
+            
+            .word {
+                font-size: 2rem;
+            }
+            
+            .meaning {
+                font-size: 1.8rem;
+            }
+            
+            .example {
+                font-size: 1rem;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+            
+            .controls {
+                gap: 10px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .card-container {
+                height: 320px;
+            }
+            
+            .word {
+                font-size: 1.6rem;
+            }
+            
+            .meaning {
+                font-size: 1.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+        }
+        
+        .instructions {
+            text-align: center;
+            margin-top: 20px;
+            color: #475569;
+            font-size: 0.9rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e0f2fe;
+            border-radius: 4px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: #0ea5e9;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        .source {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            font-size: 0.8rem;
+            color: #475569;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 3px 10px;
+            border-radius: 10px;
+        }
+        
+        .ipa-note {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 5px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PET词汇闪卡</h1>
+            <p class="subtitle">包含200+个PET考试核心词汇，点击卡片翻转，点击喇叭图标发音</p>
+            <div class="stats">
+                <div class="stat-box">
+                    <span id="current-card">1</span> / <span id="total-cards">0</span>
+                </div>
+                <div class="stat-box">
+                    已收藏: <span id="favorites-count">0</span>
+                </div>
+                <div class="stat-box">
+                    进度: <span id="progress-percent">0%</span>
+                </div>
+                <div class="stat-box">
+                    <button class="btn btn-small" id="view-favorites-btn">
+                        <i class="fas fa-bookmark"></i> 生词本
+                    </button>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress" id="progress-bar"></div>
+            </div>
+            <div class="search-box">
+                <input type="text" class="search-input" id="search-input" placeholder="搜索单词或短语...">
+            </div>
+            <div class="category-filter">
+                <button class="category-btn active" data-category="all">全部</button>
+                <button class="category-btn" data-category="noun">名词</button>
+                <button class="category-btn" data-category="verb">动词</button>
+                <button class="category-btn" data-category="adj">形容词</button>
+                <button class="category-btn" data-category="adv">副词</button>
+                <button class="category-btn" data-category="phrase">短语</button>
+                <button class="category-btn" data-category="sentence">句子</button>
+            </div>
+        </header>
+        
+        <div class="card-container">
+            <div class="card" id="flashcard">
+                <button class="favorite-btn" id="favorite-btn">
+                    <i class="far fa-heart"></i>
+                </button>
+                <button class="pronounce-btn" id="pronounce-btn">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                <div class="card-front">
+                    <div class="word" id="word-front">Loading...</div>
+                    <div class="phonetic" id="phonetic"></div>
+                    <p>点击卡片查看中文释义</p>
+                </div>
+                <div class="card-back">
+                    <div class="meaning" id="meaning-back">释义</div>
+                    <div class="example" id="example-back">
+                        <div class="example-en" id="example-en">例句英文</div>
+                        <div class="example-cn" id="example-cn">例句中文</div>
+                    </div>
+                    <div class="source" id="source"></div>
+                </div>
+                <div class="card-number" id="card-number">1/0</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" id="prev-btn">
+                <i class="fas fa-arrow-left"></i> 上一个
+            </button>
+            <button class="btn" id="flip-btn">
+                <i class="fas fa-sync-alt"></i> 翻转
+            </button>
+            <button class="btn" id="next-btn">
+                下一个 <i class="fas fa-arrow-right"></i>
+            </button>
+            <button class="btn" id="random-btn">
+                <i class="fas fa-random"></i> 随机
+            </button>
+            <button class="btn" id="shuffle-btn">
+                <i class="fas fa-random"></i> 乱序
+            </button>
+        </div>
+        
+        <p class="instructions">提示：点击卡片任意位置翻转，使用键盘← →切换，空格键翻转，R键随机</p>
+        <p class="ipa-note">注：音标采用英式发音标准</p>
+    </div>
+    
+    <!-- 生词本模态框 -->
+    <div class="modal" id="favorites-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">我的生词本</h2>
+                <button class="close-modal" id="close-modal">&times;</button>
+            </div>
+            <ul class="favorites-list" id="favorites-list">
+                <!-- 收藏的单词会动态添加到这里 -->
+            </ul>
+            <p id="empty-favorites" style="text-align: center; padding: 20px; color: #888; display: none;">
+                生词本为空，点击卡片上的心形图标收藏单词
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // 完整单词短语数据（从PDF中提取的所有内容）
+        const wordList = [
+            // Page 1 - 第一部分
+            { word: "recording", meaning: "唱片", exampleEn: "I bought a new recording of my favorite band.", exampleCn: "我买了一张我最喜欢乐队的新唱片。", phonetic: "/rɪˈkɔːdɪŋ/", category: "noun", source: "PET词汇表" },
+            { word: "review", meaning: "评价", exampleEn: "The film received positive reviews from critics.", exampleCn: "这部电影获得了评论家的积极评价。", phonetic: "/rɪˈvjuː/", category: "noun/verb", source: "PET词汇表" },
+            { word: "traditional", meaning: "传统的", exampleEn: "We celebrate traditional festivals with our family.", exampleCn: "我们和家人一起庆祝传统节日。", phonetic: "/trəˈdɪʃənl/", category: "adj", source: "PET词汇表" },
+            { word: "opera", meaning: "歌剧", exampleEn: "We went to see an Italian opera at the theatre.", exampleCn: "我们去剧院看了一场意大利歌剧。", phonetic: "/ˈɒprə/", category: "noun", source: "PET词汇表" },
+            { word: "quiz", meaning: "小测", exampleEn: "We have a vocabulary quiz every Friday.", exampleCn: "我们每周五都有词汇小测验。", phonetic: "/kwɪz/", category: "noun", source: "PET词汇表" },
+            { word: "international", meaning: "国际的", exampleEn: "She works for an international company.", exampleCn: "她在一家国际公司工作。", phonetic: "/ˌɪntəˈnæʃənl/", category: "adj", source: "PET词汇表" },
+            { word: "link", meaning: "链接", exampleEn: "Click on this link to visit the website.", exampleCn: "点击此链接访问网站。", phonetic: "/lɪŋk/", category: "noun/verb", source: "PET词汇表" },
+            { word: "article", meaning: "文章", exampleEn: "I read an interesting article about climate change.", exampleCn: "我读了一篇关于气候变化的有趣文章。", phonetic: "/ˈɑːtɪkl/", category: "noun", source: "PET词汇表" },
+            { word: "wider audience", meaning: "更广泛的观众", exampleEn: "The film aims to attract a wider audience.", exampleCn: "这部电影旨在吸引更广泛的观众。", phonetic: "/ˈwaɪdər ˈɔːdiəns/", category: "phrase", source: "PET词汇表" },
+            { word: "album", meaning: "专辑", exampleEn: "The band released their new album last month.", exampleCn: "这支乐队上个月发行了他们的新专辑。", phonetic: "/ˈælbəm/", category: "noun", source: "PET词汇表" },
+            { word: "clips", meaning: "小短片", exampleEn: "I watched some funny clips on the internet.", exampleCn: "我在网上看了一些有趣的小短片。", phonetic: "/klɪps/", category: "noun", source: "PET词汇表" },
+            { word: "discuss", meaning: "讨论", exampleEn: "Let's discuss the plan at the meeting.", exampleCn: "让我们在会议上讨论这个计划。", phonetic: "/dɪˈskʌs/", category: "verb", source: "PET词汇表" },
+            { word: "relate to", meaning: "相关", exampleEn: "The story relates to my own experiences.", exampleCn: "这个故事与我自己的经历相关。", phonetic: "/rɪˈleɪt tuː/", category: "phrase", source: "PET词汇表" },
+            { word: "give tips (advice)", meaning: "给建议", exampleEn: "The teacher gave us tips on how to study effectively.", exampleCn: "老师给了我们如何有效学习的建议。", phonetic: "/ɡɪv tɪps (ədˈvaɪs)/", category: "phrase", source: "PET词汇表" },
+            
+            // PET官方2阅读T2P2
+            { word: "hire", meaning: "租", exampleEn: "We decided to hire a car for our holiday.", exampleCn: "我们决定为假期租一辆车。", phonetic: "/ˈhaɪə(r)/", category: "verb", source: "PET官方2阅读T2P2" },
+            { word: "organizer", meaning: "组织者", exampleEn: "The event organizer did a great job.", exampleCn: "活动组织者做得很好。", phonetic: "/ˈɔːɡənaɪzə(r)/", category: "noun", source: "PET官方2阅读T2P2" },
+            { word: "review", meaning: "评价", exampleEn: "I wrote a review of the restaurant online.", exampleCn: "我在网上写了这家餐厅的评价。", phonetic: "/rɪˈvjuː/", category: "noun/verb", source: "PET官方2阅读T2P2" },
+            { word: "guest", meaning: "客人", exampleEn: "We had ten guests at our dinner party.", exampleCn: "我们的晚餐聚会有十位客人。", phonetic: "/ɡest/", category: "noun", source: "PET官方2阅读T2P2" },
+            { word: "transport", meaning: "交通", exampleEn: "Public transport is convenient in the city.", exampleCn: "城市里的公共交通很方便。", phonetic: "/ˈtrænspɔːt/", category: "noun", source: "PET官方2阅读T2P2" },
+            { word: "budget", meaning: "预算", exampleEn: "We need to stick to our budget.", exampleCn: "我们需要坚持我们的预算。", phonetic: "/ˈbʌdʒɪt/", category: "noun", source: "PET官方2阅读T2P2" },
+            { word: "is lit by candle", meaning: "被蜡烛点亮", exampleEn: "The room is lit by candle, creating a romantic atmosphere.", exampleCn: "房间被蜡烛点亮，营造出浪漫的氛围。", phonetic: "/ɪz lɪt baɪ ˈkændl/", category: "phrase", source: "PET官方2阅读T2P2" },
+            { word: "option", meaning: "选择", exampleEn: "We have several options to choose from.", exampleCn: "我们有几个选择。", phonetic: "/ˈɒpʃn/", category: "noun", source: "PET官方2阅读T2P2" },
+            { word: "previous events", meaning: "之前的活动", exampleEn: "The website has information about previous events.", exampleCn: "网站上有之前活动的信息。", phonetic: "/ˈpriːviəs ɪˈvents/", category: "phrase", source: "PET官方2阅读T2P2" },
+            { word: "positive comment", meaning: "好评", exampleEn: "The product received many positive comments.", exampleCn: "该产品收到了许多好评。", phonetic: "/ˈpɒzətɪv ˈkɒment/", category: "phrase", source: "PET官方2阅读T2P2" },
+            { word: "top quality dishes", meaning: "高质量餐食", exampleEn: "The restaurant serves top quality dishes.", exampleCn: "这家餐厅提供高质量的餐食。", phonetic: "/tɒp ˈkwɒləti ˈdɪʃɪz/", category: "phrase", source: "PET官方2阅读T2P2" },
+            { word: "venue", meaning: "场地", exampleEn: "We need to find a venue for the wedding.", exampleCn: "我们需要为婚礼找一个场地。", phonetic: "/ˈvenjuː/", category: "noun", source: "PET官方2阅读T2P2" },
+            { word: "fabulous", meaning: "棒的", exampleEn: "We had a fabulous time at the party.", exampleCn: "我们在派对上玩得很开心。", phonetic: "/ˈfæbjələs/", category: "adj", source: "PET官方2阅读T2P2" },
+            { word: "refreshment", meaning: "甜品,饮料", exampleEn: "Refreshments will be served after the meeting.", exampleCn: "会议后将提供茶点。", phonetic: "/rɪˈfreʃmənt/", category: "noun", source: "PET官方2阅读T2P2" },
+            { word: "sail", meaning: "乘船", exampleEn: "We plan to sail around the island.", exampleCn: "我们计划乘船环岛游览。", phonetic: "/seɪl/", category: "verb", source: "PET官方2阅读T2P2" },
+            
+            // Page 2 - 第一部分
+            { word: "Sea life", meaning: "海洋动物", exampleEn: "We saw amazing sea life while snorkeling.", exampleCn: "浮潜时我们看到了令人惊叹的海洋生物。", phonetic: "/siː laɪf/", category: "phrase", source: "PET词汇表" },
+            { word: "Be filled with", meaning: "充满", exampleEn: "The room was filled with laughter.", exampleCn: "房间里充满了笑声。", phonetic: "/biː fɪld wɪð/", category: "phrase", source: "PET词汇表" },
+            { word: "dive", meaning: "潜水", exampleEn: "I learned to dive when I was on holiday.", exampleCn: "我在度假时学会了潜水。", phonetic: "/daɪv/", category: "verb", source: "PET词汇表" },
+            { word: "sociable", meaning: "社交的", exampleEn: "He is a very sociable person who enjoys parties.", exampleCn: "他是一个非常善于交际的人，喜欢参加聚会。", phonetic: "/ˈsəʊʃəbl/", category: "adj", source: "PET词汇表" },
+            { word: "pine forest", meaning: "松林", exampleEn: "We went for a walk in the pine forest.", exampleCn: "我们去松林里散步。", phonetic: "/paɪn ˈfɒrɪst/", category: "phrase", source: "PET词汇表" },
+            { word: "region", meaning: "区域", exampleEn: "This region is famous for its wine.", exampleCn: "这个地区以葡萄酒闻名。", phonetic: "/ˈriːdʒən/", category: "noun", source: "PET词汇表" },
+            { word: "wooden hut", meaning: "小木屋", exampleEn: "We stayed in a wooden hut in the mountains.", exampleCn: "我们住在山上的一个小木屋里。", phonetic: "/ˈwʊdn hʌt/", category: "phrase", source: "PET词汇表" },
+            { word: "surrounding", meaning: "环境", exampleEn: "The surrounding area is very beautiful.", exampleCn: "周围的环境非常美丽。", phonetic: "/səˈraʊndɪŋ/", category: "adj", source: "PET词汇表" },
+            
+            // PET官方1阅读T3 P4
+            { word: "tutor", meaning: "家教", exampleEn: "I have a tutor to help me with maths.", exampleCn: "我有一位家教帮助我学习数学。", phonetic: "/ˈtjuːtə(r)/", category: "noun", source: "PET官方1阅读T3 P4" },
+            { word: "Intend to", meaning: "目的是", exampleEn: "I intend to finish the project by Friday.", exampleCn: "我打算在周五前完成这个项目。", phonetic: "/ɪnˈtend tuː/", category: "phrase", source: "PET官方1阅读T3 P4" },
+            { word: "session", meaning: "课程", exampleEn: "We have a training session tomorrow.", exampleCn: "我们明天有一个培训课程。", phonetic: "/ˈseʃn/", category: "noun", source: "PET官方1阅读T3 P4" },
+            { word: "permit", meaning: "允许", exampleEn: "Smoking is not permitted here.", exampleCn: "此处不允许吸烟。", phonetic: "/pəˈmɪt/", category: "verb", source: "PET官方1阅读T3 P4" },
+            { word: "ingredient", meaning: "配料", exampleEn: "The recipe requires fresh ingredients.", exampleCn: "这个食谱需要新鲜的配料。", phonetic: "/ɪnˈɡriːdiənt/", category: "noun", source: "PET官方1阅读T3 P4" },
+            { word: "therefore", meaning: "因此", exampleEn: "He was tired; therefore, he went to bed early.", exampleCn: "他累了，因此很早就上床睡觉了。", phonetic: "/ˈðeəfɔː(r)/", category: "adv", source: "PET官方1阅读T3 P4" },
+            { word: "As a result", meaning: "作为结果", exampleEn: "He studied hard, and as a result, he passed the exam.", exampleCn: "他努力学习，结果通过了考试。", phonetic: "/æz ə rɪˈzʌlt/", category: "phrase", source: "PET官方1阅读T3 P4" },
+            { word: "Left the door open", meaning: "把门打开", exampleEn: "Someone left the door open and the cat got out.", exampleCn: "有人把门开着，猫跑出去了。", phonetic: "/left ðə dɔːr ˈəʊpən/", category: "phrase", source: "PET官方1阅读T3 P4" },
+            { word: "city council", meaning: "城市委员会", exampleEn: "The city council decided to build a new park.", exampleCn: "市议会决定建造一个新公园。", phonetic: "/ˈsɪti ˈkaʊnsl/", category: "noun", source: "PET官方1阅读T3 P4" },
+            { word: "in common with", meaning: "有相同点", exampleEn: "I have a lot in common with my best friend.", exampleCn: "我和我最好的朋友有很多共同点。", phonetic: "/ɪn ˈkɒmən wɪð/", category: "phrase", source: "PET官方1阅读T3 P4" },
+            { word: "reply", meaning: "回应", exampleEn: "I'm waiting for a reply to my email.", exampleCn: "我在等待邮件的回复。", phonetic: "/rɪˈplaɪ/", category: "verb/noun", source: "PET官方1阅读T3 P4" },
+            { word: "apply to", meaning: "申请", exampleEn: "I need to apply to several universities.", exampleCn: "我需要申请几所大学。", phonetic: "/əˈplaɪ tuː/", category: "phrase", source: "PET官方1阅读T3 P4" },
+            { word: "much less", meaning: "更少", exampleEn: "I have much less free time now than before.", exampleCn: "我现在比以前的空闲时间少得多。", phonetic: "/mʌtʃ les/", category: "phrase", source: "PET官方1阅读T3 P4" },
+            { word: "Pilot's licence", meaning: "飞行员证", exampleEn: "He got his pilot's licence last year.", exampleCn: "他去年拿到了飞行员执照。", phonetic: "/ˈpaɪləts ˈlaɪsns/", category: "phrase", source: "PET官方1阅读T3 P4" },
+            { word: "used to flying", meaning: "习惯于（飞行）", exampleEn: "I'm used to flying because I travel often.", exampleCn: "我习惯飞行，因为我经常旅行。", phonetic: "/juːst tuː ˈflaɪɪŋ/", category: "phrase", source: "PET官方1阅读T3 P4" },
+            { word: "silent", meaning: "安静", exampleEn: "The library was completely silent.", exampleCn: "图书馆里非常安静。", phonetic: "/ˈsaɪlənt/", category: "adj", source: "PET官方1阅读T3 P4" },
+            { word: "progress made", meaning: "取得的进步", exampleEn: "I'm happy with the progress made in my English.", exampleCn: "我对英语取得的进步感到高兴。", phonetic: "/ˈprəʊɡres meɪd/", category: "phrase", source: "PET官方1阅读T3 P4" },
+            { word: "energy", meaning: "能量", exampleEn: "I don't have much energy today.", exampleCn: "我今天没什么精力。", phonetic: "/ˈenədʒi/", category: "noun", source: "PET官方1阅读T3 P4" },
+            { word: "distance", meaning: "距离", exampleEn: "The distance from here to the station is 2 km.", exampleCn: "从这里到车站的距离是2公里。", phonetic: "/ˈdɪstəns/", category: "noun", source: "PET官方1阅读T3 P4" },
+            { word: "mechanic", meaning: "修理师", exampleEn: "The mechanic fixed my car.", exampleCn: "修理工修好了我的车。", phonetic: "/məˈkænɪk/", category: "noun", source: "PET官方1阅读T3 P4" },
+            { word: "recover", meaning: "恢复", exampleEn: "It took him a week to recover from the flu.", exampleCn: "他花了一周时间从流感中恢复。", phonetic: "/rɪˈkʌvə(r)/", category: "verb", source: "PET官方1阅读T3 P4" },
+            { word: "reduce", meaning: "下降", exampleEn: "We need to reduce our energy consumption.", exampleCn: "我们需要减少能源消耗。", phonetic: "/rɪˈdjuːs/", category: "verb", source: "PET官方1阅读T3 P4" },
+            { word: "electronic devices", meaning: "电子设备", exampleEn: "Electronic devices are not allowed during the exam.", exampleCn: "考试期间不允许使用电子设备。", phonetic: "/ɪˌlekˈtrɒnɪk dɪˈvaɪsɪz/", category: "phrase", source: "PET官方1阅读T3 P4" },
+            
+            // Page 3 - 官方1part2阅
+            { word: "deal with", meaning: "处理", exampleEn: "I have to deal with many problems at work.", exampleCn: "我不得不处理工作中的许多问题。", phonetic: "/diːl wɪð/", category: "phrase", source: "官方1part2阅" },
+            { word: "manage to achieve their goals", meaning: "达到目标", exampleEn: "With hard work, they managed to achieve their goals.", exampleCn: "通过努力工作，他们设法实现了目标。", phonetic: "/ˈmænɪdʒ tuː əˈtʃiːv ðeə(r) ɡəʊlz/", category: "phrase", source: "官方1part2阅" },
+            { word: "further develop", meaning: "变得更好", exampleEn: "We need to further develop our skills.", exampleCn: "我们需要进一步发展我们的技能。", phonetic: "/ˈfɜːðə(r) dɪˈveləp/", category: "phrase", source: "官方1part2阅" },
+            { word: "instruction", meaning: "指示，说明", exampleEn: "Read the instructions carefully before using the machine.", exampleCn: "使用机器前请仔细阅读说明。", phonetic: "/ɪnˈstrʌkʃn/", category: "noun", source: "官方1part2阅" },
+            { word: "organization", meaning: "组织", exampleEn: "She works for a charity organization.", exampleCn: "她在一家慈善机构工作。", phonetic: "/ˌɔːɡənaɪˈzeɪʃn/", category: "noun", source: "官方1part2阅" },
+            { word: "recommendation", meaning: "建议", exampleEn: "Do you have any recommendations for a good restaurant?", exampleCn: "你有什么好餐厅推荐吗？", phonetic: "/ˌrekəmenˈdeɪʃn/", category: "noun", source: "官方1part2阅" },
+            { word: "up-to-date information", meaning: "最新消息", exampleEn: "We need up-to-date information about the situation.", exampleCn: "我们需要关于情况的最新消息。", phonetic: "/ˌʌp tə ˈdeɪt ˌɪnfəˈmeɪʃn/", category: "phrase", source: "官方1part2阅" },
+            { word: "affect", meaning: "影响", exampleEn: "The weather will affect our travel plans.", exampleCn: "天气会影响我们的旅行计划。", phonetic: "/əˈfekt/", category: "verb", source: "官方1part2阅" },
+            { word: "influence", meaning: "影响", exampleEn: "Parents have a big influence on their children.", exampleCn: "父母对孩子有很大影响。", phonetic: "/ˈɪnfluəns/", category: "noun/verb", source: "官方1part2阅" },
+            { word: "contribute", meaning: "贡献，奉献", exampleEn: "Everyone can contribute to protecting the environment.", exampleCn: "每个人都可以为保护环境做出贡献。", phonetic: "/kənˈtrɪbjuːt/", category: "verb", source: "官方1part2阅" },
+            { word: "discover", meaning: "发现", exampleEn: "Scientists discovered a new species of bird.", exampleCn: "科学家发现了一种新的鸟类。", phonetic: "/dɪˈskʌvə(r)/", category: "verb", source: "官方1part2阅" },
+            { word: "culture", meaning: "文化", exampleEn: "It's interesting to learn about different cultures.", exampleCn: "了解不同的文化很有趣。", phonetic: "/ˈkʌltʃə(r)/", category: "noun", source: "官方1part2阅" },
+            { word: "negative effect", meaning: "消极影响", exampleEn: "Smoking has a negative effect on health.", exampleCn: "吸烟对健康有负面影响。", phonetic: "/ˈneɡətɪv ɪˈfekt/", category: "phrase", source: "官方1part2阅" },
+            { word: "items", meaning: "物品，东西", exampleEn: "All items must be checked before leaving the store.", exampleCn: "所有物品在离开商店前必须检查。", phonetic: "/ˈaɪtəmz/", category: "noun", source: "官方1part2阅" },
+            { word: "opportunity", meaning: "机会", exampleEn: "This job is a great opportunity for me.", exampleCn: "这份工作对我来说是一个很好的机会。", phonetic: "/ˌɒpəˈtjuːnəti/", category: "noun", source: "官方1part2阅" },
+            { word: "recycling process", meaning: "回收过程", exampleEn: "The recycling process helps protect the environment.", exampleCn: "回收过程有助于保护环境。", phonetic: "/ˌriːˈsaɪklɪŋ ˈprəʊses/", category: "phrase", source: "官方1part2阅" },
+            { word: "adventure", meaning: "冒险", exampleEn: "Our trip to the mountains was a real adventure.", exampleCn: "我们的山区之旅是一次真正的冒险。", phonetic: "/ədˈventʃə(r)/", category: "noun", source: "官方1part2阅" },
+            { word: "inspire", meaning: "启发", exampleEn: "Her story inspired me to work harder.", exampleCn: "她的故事激励我更加努力地工作。", phonetic: "/ɪnˈspaɪə(r)/", category: "verb", source: "官方1part2阅" },
+            { word: "compete", meaning: "竞争", exampleEn: "Several companies compete for the same market.", exampleCn: "几家公司竞争同一个市场。", phonetic: "/kəmˈpiːt/", category: "verb", source: "官方1part2阅" },
+            { word: "describe", meaning: "描述", exampleEn: "Can you describe what happened?", exampleCn: "你能描述一下发生了什么吗？", phonetic: "/dɪˈskraɪb/", category: "verb", source: "官方1part2阅" },
+            { word: "treat yourself", meaning: "给自己一点奖励", exampleEn: "I like to treat myself to chocolate after a long day.", exampleCn: "我喜欢在漫长的一天后给自己一点巧克力奖励。", phonetic: "/triːt jɔːˈself/", category: "phrase", source: "官方1part2阅" },
+            { word: "power", meaning: "能量", exampleEn: "The storm knocked out the power.", exampleCn: "风暴导致停电。", phonetic: "/ˈpaʊə(r)/", category: "noun", source: "官方1part2阅" },
+            { word: "introduction", meaning: "介绍", exampleEn: "The book has a short introduction.", exampleCn: "这本书有一个简短的介绍。", phonetic: "/ˌɪntrəˈdʌkʃn/", category: "noun", source: "官方1part2阅" },
+            { word: "create", meaning: "生产，创造", exampleEn: "The artist created a beautiful painting.", exampleCn: "艺术家创作了一幅美丽的画。", phonetic: "/kriˈeɪt/", category: "verb", source: "官方1part2阅" },
+            { word: "Atlantic", meaning: "大西洋", exampleEn: "The Atlantic Ocean is between Europe and America.", exampleCn: "大西洋位于欧洲和美洲之间。", phonetic: "/ətˈlæntɪk/", category: "noun", source: "官方1part2阅" },
+            { word: "athlete", meaning: "运动员", exampleEn: "She is a professional athlete.", exampleCn: "她是一名职业运动员。", phonetic: "/ˈæθliːt/", category: "noun", source: "官方1part2阅" },
+            { word: "publish", meaning: "出版，发布", exampleEn: "The author will publish his new book next month.", exampleCn: "作者将于下月出版他的新书。", phonetic: "/ˈpʌblɪʃ/", category: "verb", source: "官方1part2阅" },
+            { word: "international", meaning: "国际的", exampleEn: "She works for an international organization.", exampleCn: "她在一家国际组织工作。", phonetic: "/ˌɪntəˈnæʃnəl/", category: "adj", source: "官方1part2阅" },
+            { word: "pay attention to", meaning: "关注", exampleEn: "Please pay attention to the instructions.", exampleCn: "请注意说明。", phonetic: "/peɪ əˈtenʃn tuː/", category: "phrase", source: "官方1part2阅" },
+            { word: "harm", meaning: "伤害", exampleEn: "Smoking can harm your health.", exampleCn: "吸烟会危害你的健康。", phonetic: "/hɑːm/", category: "noun/verb", source: "官方1part2阅" },
+            { word: "get rid of items", meaning: "扔掉东西", exampleEn: "I need to get rid of some old items.", exampleCn: "我需要扔掉一些旧东西。", phonetic: "/ɡet rɪd əv ˈaɪtəmz/", category: "phrase", source: "官方1part2阅" },
+            { word: "bills", meaning: "账单，水费、电费账单", exampleEn: "I need to pay the electricity bill.", exampleCn: "我需要付电费账单。", phonetic: "/bɪlz/", category: "noun", source: "官方1part2阅" },
+            { word: "clothes produced", meaning: "生产的服装", exampleEn: "These clothes are produced in a sustainable way.", exampleCn: "这些服装是以可持续的方式生产的。", phonetic: "/kləʊðz prəˈdjuːst/", category: "phrase", source: "官方1part2阅" },
+            { word: "There's also a section about", meaning: "也有一个区域关于", exampleEn: "There's also a section about local history in the museum.", exampleCn: "博物馆里也有一个关于当地历史的区域。", phonetic: "/ðeəz ˈɔːlsəʊ ə ˈsekʃn əˈbaʊt/", category: "sentence", source: "官方1part2阅" },
+            
+            // Page 4 - 官方1T1-2听
+            { word: "without damaging environment", meaning: "不破坏环境", exampleEn: "We should try to live without damaging the environment.", exampleCn: "我们应该努力在不破坏环境的情况下生活。", phonetic: "/wɪˈðaʊt ˈdæmɪdʒɪŋ ɪnˈvaɪrənmənt/", category: "phrase", source: "官方1T1-2听" },
+            { word: "how much attention various fashion companies pay to their effect on the environment", meaning: "服装公司多在乎对环境的影响", exampleEn: "It's interesting to see how much attention various fashion companies pay to their effect on the environment.", exampleCn: "看看各种服装公司对环境影响有多重视是很有趣的。", phonetic: "/haʊ mʌtʃ əˈtenʃn ˈveəriəs ˈfæʃn ˈkʌmpəniz peɪ tu ðeər ɪˈfekt ɒn ði ɪnˈvaɪrənmənt/", category: "sentence", source: "官方1T1-2听" },
+            
+            // Page 4 - 第二部分
+            { word: "Security guard", meaning: "保安", exampleEn: "The security guard checked our bags.", exampleCn: "保安检查了我们的包。", phonetic: "/sɪˈkjʊərəti ɡɑːd/", category: "noun", source: "官方1补充词汇" },
+            { word: "cab", meaning: "出租车", exampleEn: "We took a cab to the airport.", exampleCn: "我们乘出租车去机场。", phonetic: "/kæb/", category: "noun", source: "官方1补充词汇" },
+            { word: "rush", meaning: "冲", exampleEn: "I had to rush to catch the bus.", exampleCn: "我不得不冲过去赶公交车。", phonetic: "/rʌʃ/", category: "verb", source: "官方1补充词汇" },
+            { word: "apologize", meaning: "道歉", exampleEn: "He apologized for being late.", exampleCn: "他为迟到道歉。", phonetic: "/əˈpɒlədʒaɪz/", category: "verb", source: "官方1补充词汇" },
+            { word: "Out of tin", meaning: "罐头里倒出来", exampleEn: "I poured the soup out of the tin.", exampleCn: "我把汤从罐头里倒出来。", phonetic: "/aʊt əv tɪn/", category: "phrase", source: "官方1补充词汇" },
+            { word: "Heat up", meaning: "加热", exampleEn: "I need to heat up some water for tea.", exampleCn: "我需要加热一些水来泡茶。", phonetic: "/hiːt ʌp/", category: "phrase", source: "官方1补充词汇" },
+            { word: "Shave beard", meaning: "刮胡子", exampleEn: "He shaves his beard every morning.", exampleCn: "他每天早上刮胡子。", phonetic: "/ʃeɪv bɪəd/", category: "phrase", source: "官方1补充词汇" },
+            { word: "recognize", meaning: "认出", exampleEn: "I could barely recognize him after so many years.", exampleCn: "这么多年过去了，我几乎认不出他了。", phonetic: "/ˈrekəɡnaɪz/", category: "verb", source: "官方1补充词汇" },
+            { word: "As well", meaning: "也", exampleEn: "I like apples, and I like oranges as well.", exampleCn: "我喜欢苹果，也喜欢橙子。", phonetic: "/æz wel/", category: "phrase", source: "官方1补充词汇" },
+            { word: "Used to", meaning: "习惯于", exampleEn: "I'm used to getting up early.", exampleCn: "我习惯早起。", phonetic: "/juːst tuː/", category: "phrase", source: "官方1补充词汇" },
+            { word: "Off sick", meaning: "生病请假", exampleEn: "He's off sick today.", exampleCn: "他今天生病请假。", phonetic: "/ɒf sɪk/", category: "phrase", source: "官方1补充词汇" },
+            { word: "Exchange news", meaning: "交换八卦，消息", exampleEn: "We met to exchange news about our families.", exampleCn: "我们见面交换了关于家庭的消息。", phonetic: "/ɪksˈtʃeɪndʒ njuːz/", category: "phrase", source: "官方1补充词汇" },
+            { word: "imagination", meaning: "想象力", exampleEn: "Children have a wonderful imagination.", exampleCn: "孩子们有丰富的想象力。", phonetic: "/ɪˌmædʒɪˈneɪʃn/", category: "noun", source: "官方1补充词汇" },
+            { word: "creative", meaning: "创造力", exampleEn: "She is a very creative person.", exampleCn: "她是一个非常有创造力的人。", phonetic: "/kriˈeɪtɪv/", category: "adj", source: "官方1补充词汇" },
+            { word: "college", meaning: "大学", exampleEn: "She is studying at a college in London.", exampleCn: "她在伦敦的一所大学学习。", phonetic: "/ˈkɒlɪdʒ/", category: "noun", source: "官方1补充词汇" },
+            { word: "Still water", meaning: "纯净水", exampleEn: "I prefer still water to sparkling water.", exampleCn: "比起气泡水，我更喜欢纯净水。", phonetic: "/stɪl ˈwɔːtə(r)/", category: "phrase", source: "官方1补充词汇" },
+            { word: "Sparkling water", meaning: "气泡水", exampleEn: "Would you like still or sparkling water?", exampleCn: "您要纯净水还是气泡水？", phonetic: "/ˈspɑːklɪŋ ˈwɔːtə(r)/", category: "phrase", source: "官方1补充词汇" },
+            { word: "scene", meaning: "场景", exampleEn: "The scene in the movie was very emotional.", exampleCn: "电影中的场景非常感人。", phonetic: "/siːn/", category: "noun", source: "官方1补充词汇" },
+            { word: "Thick fog", meaning: "浓雾", exampleEn: "We couldn't drive because of the thick fog.", exampleCn: "由于浓雾，我们无法开车。", phonetic: "/θɪk fɒɡ/", category: "phrase", source: "官方1补充词汇" },
+            { word: "Southern area", meaning: "南方", exampleEn: "The southern area of the country is warmer.", exampleCn: "该国的南部地区更暖和。", phonetic: "/ˈsʌðən ˈeəriə/", category: "phrase", source: "官方1补充词汇" },
+            { word: "Northern area", meaning: "北方", exampleEn: "The northern area gets more snow.", exampleCn: "北方地区降雪更多。", phonetic: "/ˈnɔːðən ˈeəriə/", category: "phrase", source: "官方1补充词汇" },
+            { word: "Software programme", meaning: "软件程序", exampleEn: "I need to install a new software programme.", exampleCn: "我需要安装一个新的软件程序。", phonetic: "/ˈsɒftweə ˈprəʊɡræm/", category: "phrase", source: "官方1补充词汇" },
+            { word: "But it was...that", meaning: "强调（句型）", exampleEn: "But it was the music that made the film special.", exampleCn: "但正是音乐使这部电影特别。", phonetic: "/bʌt ɪt wəz... ðæt/", category: "sentence", source: "官方1补充词汇" },
+            
+            // Page 5 - 官方1补充词汇
+            { word: "celebrity", meaning: "名人", exampleEn: "The restaurant is popular with celebrities.", exampleCn: "这家餐厅很受名人欢迎。", phonetic: "/səˈlebrəti/", category: "noun", source: "官方1补充词汇" },
+            { word: "positive", meaning: "积极地，正面的", exampleEn: "Try to have a positive attitude.", exampleCn: "尽量保持积极的态度。", phonetic: "/ˈpɒzətɪv/", category: "adj", source: "官方1补充词汇" },
+            { word: "Prevent...from...", meaning: "防止...", exampleEn: "We need to prevent children from accessing dangerous websites.", exampleCn: "我们需要防止儿童访问危险网站。", phonetic: "/prɪˈvent... frɒm.../", category: "phrase", source: "官方1补充词汇" },
+            { word: "Develop a system", meaning: "发明系统", exampleEn: "They developed a system to manage the data.", exampleCn: "他们开发了一个系统来管理数据。", phonetic: "/dɪˈveləp ə ˈsɪstəm/", category: "phrase", source: "官方1补充词汇" },
+            { word: "Solve the problem", meaning: "解决问题", exampleEn: "We need to solve the problem as soon as possible.", exampleCn: "我们需要尽快解决问题。", phonetic: "/sɒlv ðə ˈprɒbləm/", category: "phrase", source: "官方1补充词汇" },
+            { word: "Spill(spilt) the liquid", meaning: "洒了液体", exampleEn: "Be careful not to spill the liquid.", exampleCn: "小心别把液体洒了。", phonetic: "/spɪl (spɪlt) ðə ˈlɪkwɪd/", category: "phrase", source: "官方1补充词汇" },
+            { word: "published", meaning: "发表，发布", exampleEn: "His article was published in a famous magazine.", exampleCn: "他的文章发表在一本著名杂志上。", phonetic: "/ˈpʌblɪʃt/", category: "verb", source: "官方1补充词汇" },
+            { word: "Be different from", meaning: "不同", exampleEn: "My opinion is different from yours.", exampleCn: "我的观点与你的不同。", phonetic: "/biː ˈdɪfrənt frɒm/", category: "phrase", source: "官方1补充词汇" },
+            { word: "The reason for", meaning: "原因是", exampleEn: "The reason for his absence is illness.", exampleCn: "他缺席的原因是生病。", phonetic: "/ðə ˈriːzn fə(r)/", category: "phrase", source: "官方1补充词汇" },
+            { word: "Look for=search for", meaning: "寻找", exampleEn: "I'm looking for my keys.", exampleCn: "我在找我的钥匙。", phonetic: "/lʊk fɔː(r)=sɜːtʃ fɔː(r)/", category: "phrase", source: "官方1补充词汇" },
+            { word: "responsibility", meaning: "责任", exampleEn: "It's your responsibility to finish the work.", exampleCn: "完成工作是你的责任。", phonetic: "/rɪˌspɒnsəˈbɪləti/", category: "noun", source: "官方1补充词汇" },
+            { word: "Ancient ruins", meaning: "古代废墟", exampleEn: "We visited ancient ruins in Greece.", exampleCn: "我们参观了希腊的古代废墟。", phonetic: "/ˈeɪnʃənt ˈruːɪnz/", category: "phrase", source: "官方1补充词汇" },
+            { word: "available", meaning: "可获得的", exampleEn: "The product is available in all stores.", exampleCn: "该产品在所有商店都有售。", phonetic: "/əˈveɪləbl/", category: "adj", source: "官方1补充词汇" },
+            { word: "attractive", meaning: "有吸引力的", exampleEn: "The offer is very attractive.", exampleCn: "这个提议很有吸引力。", phonetic: "/əˈtræktɪv/", category: "adj", source: "官方1补充词汇" },
+            { word: "Even though", meaning: "即使", exampleEn: "Even though it was raining, we went for a walk.", exampleCn: "即使下雨，我们还是去散步了。", phonetic: "/ˈiːvn ðəʊ/", category: "phrase", source: "官方1补充词汇" },
+            { word: "recently", meaning: "最近", exampleEn: "I recently started learning French.", exampleCn: "我最近开始学习法语。", phonetic: "/ˈriːsntli/", category: "adv", source: "官方1补充词汇" },
+            { word: "nowadays", meaning: "如今，古今对比", exampleEn: "Nowadays, most people have smartphones.", exampleCn: "如今，大多数人都有智能手机。", phonetic: "/ˈnaʊədeɪz/", category: "adv", source: "官方1补充词汇" },
+            { word: "Manage to", meaning: "成功做到", exampleEn: "I managed to finish the project on time.", exampleCn: "我设法按时完成了项目。", phonetic: "/ˈmænɪdʒ tuː/", category: "phrase", source: "官方1补充词汇" },
+            { word: "More than", meaning: "不只是", exampleEn: "She is more than a teacher; she's a friend.", exampleCn: "她不只是老师；她是朋友。", phonetic: "/mɔː(r) ðæn/", category: "phrase", source: "官方1补充词汇" },
+            
+            // TRAINER1TEST1词汇、短语、句子
+            { word: "fetch", meaning: "接", exampleEn: "Can you fetch the children from school?", exampleCn: "你能去学校接孩子吗？", phonetic: "/fetʃ/", category: "verb", source: "TRAINER1TEST1" },
+            { word: "arrangement", meaning: "安排", exampleEn: "We need to make arrangements for the trip.", exampleCn: "我们需要为旅行做安排。", phonetic: "/əˈreɪndʒmənt/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "In advance", meaning: "提前", exampleEn: "Please book the tickets in advance.", exampleCn: "请提前订票。", phonetic: "/ɪn ədˈvɑːns/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "reserve", meaning: "预定，保护区", exampleEn: "I'd like to reserve a table for two.", exampleCn: "我想预定一张两人桌。", phonetic: "/rɪˈzɜːv/", category: "verb/noun", source: "TRAINER1TEST1" },
+            { word: "College application", meaning: "大学申请", exampleEn: "She spent weeks preparing her college application.", exampleCn: "她花了几个星期准备大学申请。", phonetic: "/ˈkɒlɪdʒ ˌæplɪˈkeɪʃn/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "material", meaning: "材料", exampleEn: "We need more material to finish the project.", exampleCn: "我们需要更多材料来完成这个项目。", phonetic: "/məˈtɪəriəl/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "portraits", meaning: "肖像", exampleEn: "The gallery displays portraits of famous historical figures.", exampleCn: "画廊展示著名历史人物的肖像。", phonetic: "/ˈpɔːtreɪts/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "digital", meaning: "数码的", exampleEn: "I prefer digital cameras to film cameras.", exampleCn: "比起胶片相机，我更喜欢数码相机。", phonetic: "/ˈdɪdʒɪtl/", category: "adj", source: "TRAINER1TEST1" },
+            { word: "require", meaning: "需要", exampleEn: "This job requires excellent communication skills.", exampleCn: "这份工作需要出色的沟通技巧。", phonetic: "/rɪˈkwaɪə(r)/", category: "verb", source: "TRAINER1TEST1" },
+            { word: "landscape", meaning: "地貌，风景", exampleEn: "The landscape of the countryside is beautiful.", exampleCn: "乡村的风景很美。", phonetic: "/ˈlændskeɪp/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "Sew", meaning: "缝纫", exampleEn: "My grandmother taught me how to sew.", exampleCn: "我祖母教我如何缝纫。", phonetic: "/səʊ/", category: "verb", source: "TRAINER1TEST1" },
+            { word: "roughly", meaning: "大约，粗略", exampleEn: "There were roughly 50 people at the party.", exampleCn: "派对大约有50人。", phonetic: "/ˈrʌfli/", category: "adv", source: "TRAINER1TEST1" },
+            { word: "luxury", meaning: "奢华的", exampleEn: "They stayed in a luxury hotel.", exampleCn: "他们住在一家豪华酒店。", phonetic: "/ˈlʌkʃəri/", category: "adj", source: "TRAINER1TEST1" },
+            { word: "ancient", meaning: "古代的", exampleEn: "We visited ancient ruins in Greece.", exampleCn: "我们参观了希腊的古代遗迹。", phonetic: "/ˈeɪnʃənt/", category: "adj", source: "TRAINER1TEST1" },
+            { word: "pot", meaning: "罐子", exampleEn: "I need a pot to cook the soup.", exampleCn: "我需要一个罐子来煮汤。", phonetic: "/pɒt/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "ordinary", meaning: "普通，日常的", exampleEn: "It was just an ordinary day.", exampleCn: "这只是普通的一天。", phonetic: "/ˈɔːdnri/", category: "adj", source: "TRAINER1TEST1" },
+            { word: "sculpture", meaning: "雕塑", exampleEn: "There is a beautiful sculpture in the park.", exampleCn: "公园里有一个美丽的雕塑。", phonetic: "/ˈskʌlptʃə(r)/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "thick", meaning: "厚", exampleEn: "She wore a thick coat because it was cold.", exampleCn: "她穿了一件厚外套，因为天气冷。", phonetic: "/θɪk/", category: "adj", source: "TRAINER1TEST1" },
+            { word: "contain", meaning: "包含", exampleEn: "The box contains books.", exampleCn: "盒子里有书。", phonetic: "/kənˈteɪn/", category: "verb", source: "TRAINER1TEST1" },
+            { word: "attach", meaning: "附加", exampleEn: "Please attach the file to your email.", exampleCn: "请将文件附加到您的电子邮件中。", phonetic: "/əˈtætʃ/", category: "verb", source: "TRAINER1TEST1" },
+            { word: "Hand in", meaning: "上交", exampleEn: "Please hand in your homework by Friday.", exampleCn: "请于周五前交作业。", phonetic: "/hænd ɪn/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "I don't think you have been there, have you?", meaning: "我觉得你没去过那儿，是吗？", exampleEn: "I don't think you have been to Paris, have you?", exampleCn: "我觉得你没去过巴黎，是吗？", phonetic: "/aɪ dəʊnt θɪŋk juː hæv biːn ðeə(r), hæv juː/", category: "sentence", source: "TRAINER1TEST1" },
+            { word: "Visitors have the chance to make their own ice sculpture", meaning: "游客有机会制作自己的冰雕", exampleEn: "At the festival, visitors have the chance to make their own ice sculpture.", exampleCn: "在节日期间，游客有机会制作自己的冰雕。", phonetic: "/ˈvɪzɪtəz hæv ðə tʃɑːns tuː meɪk ðeər əʊn aɪs ˈskʌlptʃə/", category: "sentence", source: "TRAINER1TEST1" },
+            { word: "There is a park where absolutely everything is made of ice", meaning: "有一个公园，里面所有东西都是冰做的", exampleEn: "There is a park where absolutely everything is made of ice.", exampleCn: "有一个公园，里面所有东西都是冰做的。", phonetic: "/ðeər ɪz ə pɑːk weə(r) ˈæbsəluːtli ˈevriθɪŋ ɪz meɪd əv aɪs/", category: "sentence", source: "TRAINER1TEST1" },
+            { word: "It's very common to find wonderful sculptures in them", meaning: "在里面发现精美的雕塑很常见", exampleEn: "It's very common to find wonderful sculptures in them.", exampleCn: "在里面发现精美的雕塑很常见。", phonetic: "/ɪts ˈveri ˈkɒmən tuː faɪnd ˈwʌndəfl ˈskʌlptʃəz ɪn ðəm/", category: "sentence", source: "TRAINER1TEST1" },
+            { word: "It makes sense!", meaning: "合理，有道理！", exampleEn: "Your explanation makes sense!", exampleCn: "你的解释有道理！", phonetic: "/ɪt meɪks sens/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "within walking distance", meaning: "走路就能到", exampleEn: "The supermarket is within walking distance.", exampleCn: "超市在步行距离内。", phonetic: "/wɪˈðɪn ˈwɔːkɪŋ ˈdɪstəns/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "Transfer your designs onto cotton and silk", meaning: "把设计转印到棉和丝绸上", exampleEn: "The artist transfers her designs onto cotton and silk.", exampleCn: "艺术家将她的设计转印到棉和丝绸上。", phonetic: "/trænsˈfɜː(r) jɔː(r) dɪˈzaɪnz ˈɒntə ˈkɒtn ənd sɪlk/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "Produce artwork to support his college application", meaning: "创作作品以支持他的大学申请", exampleEn: "He produces artwork to support his college application.", exampleCn: "他创作作品以支持他的大学申请。", phonetic: "/prəˈdjuːs ˈɑːtwɜːk tuː səˈpɔːt hɪz ˈkɒlɪdʒ ˌæplɪˈkeɪʃn/", category: "phrase", source: "TRAINER1TEST1" },
+            
+            // Page 7 - 词汇、短语、句子
+            { word: "giant", meaning: "巨大", exampleEn: "They built a giant statue in the park.", exampleCn: "他们在公园里建了一座巨大的雕像。", phonetic: "/ˈdʒaɪənt/", category: "adj", source: "TRAINER1TEST1" },
+            { word: "increase", meaning: "增加", exampleEn: "The company plans to increase production next year.", exampleCn: "公司计划明年增加产量。", phonetic: "/ɪnˈkriːs/", category: "verb", source: "TRAINER1TEST1" },
+            { word: "Intent to", meaning: "目的为了", exampleEn: "I intent to visit my grandparents this weekend.", exampleCn: "我打算这个周末去看望我的祖父母。", phonetic: "/ɪnˈtent tuː/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "announce", meaning: "宣布", exampleEn: "The government will announce the results tomorrow.", exampleCn: "政府明天将宣布结果。", phonetic: "/əˈnaʊns/", category: "verb", source: "TRAINER1TEST1" },
+            { word: "Is short of", meaning: "缺少", exampleEn: "We are short of time, so we need to hurry.", exampleCn: "我们时间不够，所以需要快点。", phonetic: "/ɪz ʃɔːt əv/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "Not 形容词 at all", meaning: "根本不（加形容词）", exampleEn: "I'm not tired at all.", exampleCn: "我一点也不累。", phonetic: "/nɒt [adjective] æt ɔːl/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "No time at all", meaning: "根本没时间", exampleEn: "I have no time at all to finish this project.", exampleCn: "我根本没时间完成这个项目。", phonetic: "/nəʊ taɪm æt ɔːl/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "mention", meaning: "提到", exampleEn: "He didn't mention that he was leaving.", exampleCn: "他没有提到他要离开。", phonetic: "/ˈmenʃn/", category: "verb", source: "TRAINER1TEST1" },
+            { word: "least favourite", meaning: "最少，最不喜欢", exampleEn: "Maths is my least favourite subject.", exampleCn: "数学是我最不喜欢的科目。", phonetic: "/liːst ˈfeɪvərɪt/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "raw", meaning: "生的", exampleEn: "I prefer to eat vegetables raw.", exampleCn: "我更喜欢生吃蔬菜。", phonetic: "/rɔː/", category: "adj", source: "TRAINER1TEST1" },
+            { word: "hang", meaning: "挂着", exampleEn: "I'll hang the picture on the wall.", exampleCn: "我会把画挂在墙上。", phonetic: "/hæŋ/", category: "verb", source: "TRAINER1TEST1" },
+            { word: "bitter", meaning: "苦的", exampleEn: "The medicine tastes bitter.", exampleCn: "这种药尝起来很苦。", phonetic: "/ˈbɪtə(r)/", category: "adj", source: "TRAINER1TEST1" },
+            { word: "admit", meaning: "承认", exampleEn: "He admitted that he was wrong.", exampleCn: "他承认他错了。", phonetic: "/ədˈmɪt/", category: "verb", source: "TRAINER1TEST1" },
+            { word: "reasonable", meaning: "合理的", exampleEn: "The price seems reasonable.", exampleCn: "价格似乎合理。", phonetic: "/ˈriːznəbl/", category: "adj", source: "TRAINER1TEST1" },
+            { word: "repeat", meaning: "重复", exampleEn: "Could you repeat that, please?", exampleCn: "你能重复一下吗？", phonetic: "/rɪˈpiːt/", category: "verb", source: "TRAINER1TEST1" },
+            { word: "athletic", meaning: "体育的，运动员的", exampleEn: "She is very athletic and enjoys sports.", exampleCn: "她非常运动型，喜欢体育运动。", phonetic: "/æθˈletɪk/", category: "adj", source: "TRAINER1TEST1" },
+            { word: "Long-distance runner", meaning: "长距离跑步者", exampleEn: "He is a long-distance runner and has won many races.", exampleCn: "他是一名长跑运动员，赢得了许多比赛。", phonetic: "/ˌlɒŋ ˈdɪstəns ˈrʌnə(r)/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "admire", meaning: "佩服", exampleEn: "I admire her for her courage.", exampleCn: "我佩服她的勇气。", phonetic: "/ədˈmaɪə(r)/", category: "verb", source: "TRAINER1TEST1" },
+            { word: "facilities", meaning: "设备", exampleEn: "The school has excellent sports facilities.", exampleCn: "学校有优秀的体育设施。", phonetic: "/fəˈsɪlətiz/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "injure", meaning: "受伤", exampleEn: "He injured his leg while playing football.", exampleCn: "他在踢足球时伤了腿。", phonetic: "/ˈɪndʒə(r)/", category: "verb", source: "TRAINER1TEST1" },
+            { word: "Develop technique", meaning: "提高技能", exampleEn: "He needs to develop his swimming technique.", exampleCn: "他需要提高他的游泳技巧。", phonetic: "/dɪˈveləp tekˈniːk/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "pretend", meaning: "假装", exampleEn: "The children pretended to be pirates.", exampleCn: "孩子们假装是海盗。", phonetic: "/prɪˈtend/", category: "verb", source: "TRAINER1TEST1" },
+            { word: "Financial help", meaning: "经济支持", exampleEn: "The university offers financial help to students in need.", exampleCn: "大学为有需要的学生提供经济支持。", phonetic: "/faɪˈnænʃl help/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "One effect it has had on her", meaning: "对她产生的一个影响", exampleEn: "One effect it has had on her is that she is now more confident.", exampleCn: "对她产生的一个影响是，她现在更加自信了。", phonetic: "/wʌn ɪˈfekt ɪt hæz hæd ɒn hɜː(r)/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "Storylines and animations", meaning: "故事线和动画", exampleEn: "The film has interesting storylines and animations.", exampleCn: "这部电影有有趣的故事情节和动画。", phonetic: "/ˈstɔːrilaɪnz ənd ˌænɪˈmeɪʃnz/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "courage", meaning: "勇气", exampleEn: "It takes courage to speak in front of a large audience.", exampleCn: "在大量观众面前讲话需要勇气。", phonetic: "/ˈkʌrɪdʒ/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "graphic", meaning: "插画", exampleEn: "The book contains many beautiful graphics.", exampleCn: "这本书包含许多美丽的插画。", phonetic: "/ˈɡræfɪk/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "Make progress", meaning: "进步", exampleEn: "I'm making good progress with my French lessons.", exampleCn: "我的法语课取得了良好的进步。", phonetic: "/meɪk ˈprəʊɡres/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "Change minds about", meaning: "改变想法", exampleEn: "The film changed my mind about the importance of education.", exampleCn: "这部电影改变了我对教育重要性的看法。", phonetic: "/tʃeɪndʒ maɪndz əˈbaʊt/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "solution", meaning: "解决方案", exampleEn: "We need to find a solution to this problem.", exampleCn: "我们需要找到这个问题的解决方案。", phonetic: "/səˈluːʃn/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "Stick to", meaning: "坚持", exampleEn: "You should stick to your plan.", exampleCn: "你应该坚持你的计划。", phonetic: "/stɪk tuː/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "ambition", meaning: "雄心壮志", exampleEn: "His ambition is to become a doctor.", exampleCn: "他的雄心壮志是成为一名医生。", phonetic: "/æmˈbɪʃn/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "Wonder if", meaning: "想知道是否", exampleEn: "I wonder if it will rain tomorrow.", exampleCn: "我想知道明天是否会下雨。", phonetic: "/ˈwʌndə(r) ɪf/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "Wonder whether", meaning: "想知道是否", exampleEn: "I wonder whether she will come to the party.", exampleCn: "我想知道她是否会来参加派对。", phonetic: "/ˈwʌndə(r) ˈweðə(r)/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "No longer serve", meaning: "不再提供", exampleEn: "The restaurant no longer serves breakfast.", exampleCn: "这家餐厅不再提供早餐。", phonetic: "/nəʊ ˈlɒŋɡə(r) sɜːv/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "Reduce price", meaning: "降价", exampleEn: "The shop decided to reduce prices before Christmas.", exampleCn: "商店决定在圣诞节前降价。", phonetic: "/rɪˈdjuːs praɪs/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "All goods", meaning: "所有商品", exampleEn: "All goods in the store are on sale.", exampleCn: "商店里的所有商品都在打折。", phonetic: "/ɔːl ɡʊdz/", category: "phrase", source: "TRAINER1TEST1" },
+            
+            // Page 8 - 词汇
+            { word: "Gym kit", meaning: "体育套装", exampleEn: "Don't forget to bring your gym kit tomorrow.", exampleCn: "明天别忘了带你的体育套装。", phonetic: "/dʒɪm kɪt/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "I've been doing", meaning: "一直在做", exampleEn: "I've been doing my homework for two hours.", exampleCn: "我已经做了两个小时的家庭作业了。", phonetic: "/aɪv biːn ˈduːɪŋ/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "One day soon", meaning: "很快将来有一天", exampleEn: "One day soon, I will visit Japan.", exampleCn: "很快将来有一天，我会去日本。", phonetic: "/wʌn deɪ suːn/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "pleasant", meaning: "开心，舒适", exampleEn: "We had a pleasant time at the beach.", exampleCn: "我们在海滩度过了一段愉快的时光。", phonetic: "/ˈpleznt/", category: "adj", source: "TRAINER1TEST1" },
+            { word: "flavor", meaning: "口味", exampleEn: "This ice cream has a delicious chocolate flavor.", exampleCn: "这种冰淇淋有美味的巧克力口味。", phonetic: "/ˈfleɪvə(r)/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "moods", meaning: "情绪", exampleEn: "Her moods change quickly.", exampleCn: "她的情绪变化很快。", phonetic: "/muːdz/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "sense", meaning: "感觉", exampleEn: "I have a sense that something is wrong.", exampleCn: "我感觉有些不对劲。", phonetic: "/sens/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "According to", meaning: "根据", exampleEn: "According to the weather forecast, it will rain tomorrow.", exampleCn: "根据天气预报，明天会下雨。", phonetic: "/əˈkɔːdɪŋ tuː/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "psychologist", meaning: "心理学家", exampleEn: "The psychologist helped her deal with stress.", exampleCn: "心理学家帮助她应对压力。", phonetic: "/saɪˈkɒlədʒɪst/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "Attach to", meaning: "附加", exampleEn: "Please attach the document to your email.", exampleCn: "请将文件附加到您的电子邮件中。", phonetic: "/əˈtætʃ tuː/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "Hang in", meaning: "挂着；坚持住", exampleEn: "Hang in there, everything will be fine.", exampleCn: "坚持住，一切都会好起来的。", phonetic: "/hæŋ ɪn/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "drop", meaning: "滴，掉下来", exampleEn: "Be careful not to drop the glass.", exampleCn: "小心别把玻璃杯掉下来。", phonetic: "/drɒp/", category: "verb", source: "TRAINER1TEST1" },
+            { word: "Connect with", meaning: "有联系", exampleEn: "I find it easy to connect with people who share my interests.", exampleCn: "我发现很容易与和我有共同兴趣的人建立联系。", phonetic: "/kəˈnekt wɪð/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "Taste develop as they grow up", meaning: "口味随成长发生变化", exampleEn: "Children's taste develop as they grow up.", exampleCn: "孩子们的口味随着成长而变化。", phonetic: "/teɪst dɪˈveləp æz ðeɪ ɡrəʊ ʌp/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "warn", meaning: "警告", exampleEn: "I warned him about the dangers of smoking.", exampleCn: "我警告过他吸烟的危险。", phonetic: "/wɔːn/", category: "verb", source: "TRAINER1TEST1" },
+            { word: "Make sure", meaning: "确保", exampleEn: "Make sure you lock the door when you leave.", exampleCn: "确保你离开时锁门。", phonetic: "/meɪk ʃʊə(r)/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "Are much more likely to", meaning: "更有可能，更倾向于", exampleEn: "Children are much more likely to enjoy playing outside.", exampleCn: "孩子们更有可能喜欢在外面玩。", phonetic: "/ɑː(r) mʌtʃ mɔː(r) ˈlaɪkli tuː/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "It's possible to do", meaning: "有可能做", exampleEn: "It's possible to learn a language at any age.", exampleCn: "在任何年龄学习一门语言都是可能的。", phonetic: "/ɪts ˈpɒsəbl tuː duː/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "take up", meaning: "从事（行业）", exampleEn: "She decided to take up painting as a hobby.", exampleCn: "她决定把绘画作为一种爱好。", phonetic: "/teɪk ʌp/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "hero", meaning: "英雄", exampleEn: "He is a hero for saving the child from the fire.", exampleCn: "他从火灾中救了孩子，是个英雄。", phonetic: "/ˈhɪərəʊ/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "Hit the water", meaning: "打到水面", exampleEn: "The stone hit the water and sank.", exampleCn: "石头打在水面上然后沉了下去。", phonetic: "/hɪt ðə ˈwɔːtə(r)/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "Such a speed", meaning: "如此速度", exampleEn: "The car was travelling at such a speed that it was dangerous.", exampleCn: "汽车以如此快的速度行驶，非常危险。", phonetic: "/sʌtʃ ə spiːd/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "Handle it", meaning: "处理，搞定", exampleEn: "I'm sure you can handle it.", exampleCn: "我相信你能搞定它。", phonetic: "/ˈhændl ɪt/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "facility", meaning: "设备", exampleEn: "The sports facility is open to the public.", exampleCn: "体育设施对公众开放。", phonetic: "/fəˈsɪləti/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "Aren't as many as they used to be", meaning: "不像以前一样多", exampleEn: "There aren't as many birds in the park as they used to be.", exampleCn: "公园里的鸟不像以前那么多了。", phonetic: "/ɑːnt æz ˈmeni æz ðeɪ juːst tu biː/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "Focus", meaning: "专注", exampleEn: "You need to focus on your studies.", exampleCn: "你需要专注于你的学习。", phonetic: "/ˈfəʊkəs/", category: "verb", source: "TRAINER1TEST1" },
+            { word: "Definitely keep on diving", meaning: "绝对一直坚持潜水", exampleEn: "I will definitely keep on diving.", exampleCn: "我绝对会一直坚持潜水。", phonetic: "/ˈdefɪnətli kiːp ɒn ˈdaɪvɪŋ/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "I hadn't realized", meaning: "没意识到（表惊讶）", exampleEn: "I hadn't realized how late it was.", exampleCn: "我没意识到已经这么晚了。", phonetic: "/aɪ ˈhædnt ˈriːəlaɪzd/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "Not expected", meaning: "没想到（表惊讶）", exampleEn: "The result was not expected.", exampleCn: "这个结果没想到。", phonetic: "/nɒt ɪkˈspektɪd/", category: "phrase", source: "TRAINER1TEST1" },
+            
+            // Page 9 - 词汇
+            { word: "Natural talents", meaning: "天然才能", exampleEn: "She has natural talents for music.", exampleCn: "她有音乐天赋。", phonetic: "/ˈnætʃrəl ˈtælənts/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "Lifestyle", meaning: "生活方式", exampleEn: "A healthy lifestyle is important for good health.", exampleCn: "健康的生活方式对身体健康很重要。", phonetic: "/ˈlaɪfstaɪl/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "Have a break for a while", meaning: "休息一段时间", exampleEn: "Let's have a break for a while.", exampleCn: "让我们休息一会儿。", phonetic: "/hæv ə breɪk fə(r) ə waɪl/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "Educational purpose", meaning: "教育目的", exampleEn: "The museum visit has an educational purpose.", exampleCn: "参观博物馆具有教育目的。", phonetic: "/ˌedʒuˈkeɪʃənl ˈpɜːpəs/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "complex", meaning: "复杂", exampleEn: "The situation is more complex than it seems.", exampleCn: "情况比看起来更复杂。", phonetic: "/ˈkɒmpleks/", category: "adj", source: "TRAINER1TEST1" },
+            { word: "complicated", meaning: "复杂", exampleEn: "The instructions are too complicated to follow.", exampleCn: "说明太复杂，难以遵循。", phonetic: "/ˈkɒmplɪkeɪtɪd/", category: "adj", source: "TRAINER1TEST1" },
+            { word: "One serious side of industry", meaning: "一个严肃的方面", exampleEn: "Pollution is one serious side of industry.", exampleCn: "污染是工业的一个严重方面。", phonetic: "/wʌn ˈsɪəriəs saɪd əv ˈɪndəstri/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "simple", meaning: "简单的", exampleEn: "The solution is simple.", exampleCn: "解决方案很简单。", phonetic: "/ˈsɪmpl/", category: "adj", source: "TRAINER1TEST1" },
+            { word: "method", meaning: "方法", exampleEn: "This is an effective method of learning.", exampleCn: "这是一种有效的学习方法。", phonetic: "/ˈmeθəd/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "Keen reader", meaning: "热衷于读书", exampleEn: "He is a keen reader of science fiction.", exampleCn: "他是一个热衷于读科幻小说的人。", phonetic: "/kiːn ˈriːdə(r)/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "Be keen on", meaning: "热衷于", exampleEn: "She is keen on playing tennis.", exampleCn: "她热衷于打网球。", phonetic: "/biː kiːn ɒn/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "probably", meaning: "有可能的", exampleEn: "He will probably arrive at 8 o'clock.", exampleCn: "他可能会在8点到达。", phonetic: "/ˈprɒbəbli/", category: "adv", source: "TRAINER1TEST1" },
+            { word: "situation", meaning: "情况", exampleEn: "The current situation is difficult.", exampleCn: "目前的情况很困难。", phonetic: "/ˌsɪtʃuˈeɪʃn/", category: "noun", source: "TRAINER1TEST1" },
+            { word: "Have something in common with", meaning: "有相同点", exampleEn: "We have a lot in common with each other.", exampleCn: "我们彼此有很多共同点。", phonetic: "/hæv ˈsʌmθɪŋ ɪn ˈkɒmən wɪð/", category: "phrase", source: "TRAINER1TEST1" },
+            { word: "almost", meaning: "几乎", exampleEn: "I almost finished the book.", exampleCn: "我几乎读完了这本书。", phonetic: "/ˈɔːlməʊst/", category: "adv", source: "TRAINER1TEST1" },
+            
+            // TRAINER1TEST3听力
+            { word: "A few times", meaning: "几次", exampleEn: "I've been to London a few times.", exampleCn: "我去过伦敦几次。", phonetic: "/ə fjuː taɪmz/", category: "phrase", source: "TRAINER1TEST3听力" },
+            { word: "end up", meaning: "最终", exampleEn: "We ended up going to the cinema.", exampleCn: "我们最终去了电影院。", phonetic: "/end ʌp/", category: "phrase", source: "TRAINER1TEST3听力" },
+            { word: "teeth check", meaning: "牙齿检查", exampleEn: "I have a teeth check next week.", exampleCn: "我下周有牙齿检查。", phonetic: "/tiːθ tʃek/", category: "phrase", source: "TRAINER1TEST3听力" },
+            { word: "Up to you", meaning: "取决于你", exampleEn: "It's up to you to decide.", exampleCn: "由你决定。", phonetic: "/ʌp tu juː/", category: "phrase", source: "TRAINER1TEST3听力" },
+            { word: "nothing to do with", meaning: "毫无关系", exampleEn: "This has nothing to do with you.", exampleCn: "这和你毫无关系。", phonetic: "/ˈnʌθɪŋ tu duː wɪð/", category: "phrase", source: "TRAINER1TEST3听力" },
+            { word: "Apart from", meaning: "除了", exampleEn: "Apart from English, she speaks French.", exampleCn: "除了英语，她还会说法语。", phonetic: "/əˈpɑːt frəm/", category: "phrase", source: "TRAINER1TEST3听力" },
+            { word: "I can't say I was unhappy about the result", meaning: "对结果满意", exampleEn: "I can't say I was unhappy about the result; in fact, I was pleased.", exampleCn: "我不能说我对结果不满意；事实上，我很高兴。", phonetic: "/aɪ kɑːnt seɪ aɪ wəz ʌnˈhæpi əˈbaʊt ðə rɪˈzʌlt/", category: "sentence", source: "TRAINER1TEST3听力" },
+            { word: "imagine", meaning: "想象一下", exampleEn: "Imagine you are on a desert island.", exampleCn: "想象一下你在一个荒岛上。", phonetic: "/ɪˈmædʒɪn/", category: "verb", source: "TRAINER1TEST3听力" },
+            { word: "Stuff for experiments", meaning: "实验物品", exampleEn: "We need to buy some stuff for experiments.", exampleCn: "我们需要买一些实验物品。", phonetic: "/stʌf fə(r) ɪkˈsperɪmənts/", category: "phrase", source: "TRAINER1TEST3听力" },
+            { word: "Share the same taste", meaning: "有相同品味", exampleEn: "We share the same taste in music.", exampleCn: "我们在音乐上有相同的品味。", phonetic: "/ʃeə(r) ðə seɪm teɪst/", category: "phrase", source: "TRAINER1TEST3听力" },
+            { word: "I can't think of a building I like the look of more", meaning: "我想不出一个更喜欢（建筑）了，最喜欢这个", exampleEn: "I can't think of a building I like the look of more than this one.", exampleCn: "我想不出一个比这个更喜欢的建筑了。", phonetic: "/aɪ kɑːnt θɪŋk əv ə ˈbɪldɪŋ aɪ laɪk ðə lʊk əv mɔː(r)/", category: "sentence", source: "TRAINER1TEST3听力" },
+            { word: "I can't think of a better book", meaning: "想不出更好的书，这个最好了", exampleEn: "I can't think of a better book than this one.", exampleCn: "我想不出比这本书更好的书了。", phonetic: "/aɪ kɑːnt θɪŋk əv ə ˈbetə(r) bʊk/", category: "sentence", source: "TRAINER1TEST3听力" },
+            { word: "I'm really impressed with", meaning: "被惊艳到", exampleEn: "I'm really impressed with your work.", exampleCn: "我对你的工作印象深刻。", phonetic: "/aɪm ˈrɪəli ɪmˈprest wɪð/", category: "phrase", source: "TRAINER1TEST3听力" },
+            { word: "Be familiar with", meaning: "熟悉", exampleEn: "Are you familiar with this software?", exampleCn: "你熟悉这个软件吗？", phonetic: "/biː fəˈmɪliə(r) wɪð/", category: "phrase", source: "TRAINER1TEST3听力" },
+            { word: "Entries, entry", meaning: "记录，作品", exampleEn: "Please send your entries by Friday.", exampleCn: "请在周五前发送您的作品。", phonetic: "/ˈentriz, ˈentri/", category: "noun", source: "TRAINER1TEST3听力" },
+            { word: "delighted", meaning: "开心", exampleEn: "I'm delighted to hear the good news.", exampleCn: "听到这个好消息我很高兴。", phonetic: "/dɪˈlaɪtɪd/", category: "adj", source: "TRAINER1TEST3听力" },
+            { word: "Loads of stuff", meaning: "很多东西", exampleEn: "There are loads of stuff in the attic.", exampleCn: "阁楼里有很多东西。", phonetic: "/ləʊdz əv stʌf/", category: "phrase", source: "TRAINER1TEST3听力" },
+            { word: "obviously", meaning: "很明显", exampleEn: "Obviously, we need to do something about this.", exampleCn: "很明显，我们需要对此做些什么。", phonetic: "/ˈɒbviəsli/", category: "adv", source: "TRAINER1TEST3听力" },
+            { word: "Coursebook=textbook", meaning: "书本，课本", exampleEn: "Don't forget to bring your coursebook tomorrow.", exampleCn: "明天别忘了带你的课本。", phonetic: "/ˈkɔːsbʊk=ˈtekstbʊk/", category: "noun", source: "TRAINER1TEST3听力" },
+            
+            // TRAINER1TEST4词汇、短语、句子
+            { word: "congratulations", meaning: "庆祝", exampleEn: "Congratulations on your success!", exampleCn: "祝贺你成功！", phonetic: "/kənˌɡrætʃuˈleɪʃnz/", category: "noun", source: "TRAINER1TEST4" },
+            { word: "are reserved", meaning: "被保留，被锁定", exampleEn: "These seats are reserved for elderly people.", exampleCn: "这些座位是留给老年人的。", phonetic: "/ɑː(r) rɪˈzɜːvd/", category: "phrase", source: "TRAINER1TEST4" },
+            { word: "Don't charge a lot", meaning: "不贵", exampleEn: "This hotel doesn't charge a lot for rooms.", exampleCn: "这家酒店的客房收费不贵。", phonetic: "/dəʊnt tʃɑːdʒ ə lɒt/", category: "phrase", source: "TRAINER1TEST4" },
+            { word: "recently", meaning: "最近", exampleEn: "I recently started a new job.", exampleCn: "我最近开始了一份新工作。", phonetic: "/ˈriːsntli/", category: "adv", source: "TRAINER1TEST4" },
+            { word: "Keep going", meaning: "坚持下去", exampleEn: "Keep going, you're doing well.", exampleCn: "坚持下去，你做得很好。", phonetic: "/kiːp ˈɡəʊɪŋ/", category: "phrase", source: "TRAINER1TEST4" },
+            { word: "raven", meaning: "乌鸦", exampleEn: "A raven landed on the tree.", exampleCn: "一只乌鸦落在了树上。", phonetic: "/ˈreɪvn/", category: "noun", source: "TRAINER1TEST4" },
+            { word: "Simple task", meaning: "简单的任务", exampleEn: "This is a simple task that won't take long.", exampleCn: "这是一个简单的任务，不会花很长时间。", phonetic: "/ˈsɪmpl tɑːsk/", category: "phrase", source: "TRAINER1TEST4" },
+            { word: "tool", meaning: "工具", exampleEn: "This tool is useful for fixing bikes.", exampleCn: "这个工具对修理自行车很有用。", phonetic: "/tuːl/", category: "noun", source: "TRAINER1TEST4" },
+            { word: "Carry out", meaning: "实施", exampleEn: "We need to carry out more research.", exampleCn: "我们需要进行更多的研究。", phonetic: "/ˈkæri aʊt/", category: "phrase", source: "TRAINER1TEST4" },
+            { word: "amount", meaning: "数量", exampleEn: "A small amount of sugar is needed.", exampleCn: "需要少量糖。", phonetic: "/əˈmaʊnt/", category: "noun", source: "TRAINER1TEST4" },
+            { word: "Compare with", meaning: "对比", exampleEn: "Let's compare this year's results with last year's.", exampleCn: "让我们把今年的结果与去年的对比一下。", phonetic: "/kəmˈpeə(r) wɪð/", category: "phrase", source: "TRAINER1TEST4" },
+            { word: "flat", meaning: "平坦", exampleEn: "The road is flat and easy to walk on.", exampleCn: "这条路平坦，容易行走。", phonetic: "/flæt/", category: "adj", source: "TRAINER1TEST4" },
+            { word: "Take off", meaning: "起飞", exampleEn: "The plane will take off in ten minutes.", exampleCn: "飞机将在十分钟后起飞。", phonetic: "/teɪk ɒf/", category: "phrase", source: "TRAINER1TEST4" },
+            { word: "In reality", meaning: "现实中", exampleEn: "In reality, things are more complicated.", exampleCn: "现实中，事情更复杂。", phonetic: "/ɪn riˈæləti/", category: "phrase", source: "TRAINER1TEST4" },
+            { word: "first on my list", meaning: "最想要的", exampleEn: "A new bike is first on my list.", exampleCn: "一辆新自行车是我最想要的。", phonetic: "/fɜːst ɒn maɪ lɪst/", category: "phrase", source: "TRAINER1TEST4" },
+            
+            // TRAINER1TEST5词汇、短语、句子
+            { word: "permission", meaning: "准许", exampleEn: "You need permission to enter this area.", exampleCn: "你需要许可才能进入这个区域。", phonetic: "/pəˈmɪʃn/", category: "noun", source: "TRAINER1TEST5" },
+            { word: "inform", meaning: "通知", exampleEn: "Please inform me if there are any changes.", exampleCn: "如果有任何变化，请通知我。", phonetic: "/ɪnˈfɔːm/", category: "verb", source: "TRAINER1TEST5" },
+            { word: "replace", meaning: "代替", exampleEn: "We need to replace the broken window.", exampleCn: "我们需要更换破碎的窗户。", phonetic: "/rɪˈpleɪs/", category: "verb", source: "TRAINER1TEST5" },
+            { word: "For ages", meaning: "很久", exampleEn: "I haven't seen you for ages.", exampleCn: "我很久没见到你了。", phonetic: "/fə(r) ˈeɪdʒɪz/", category: "phrase", source: "TRAINER1TEST5" },
+            { word: "Take very much interest in", meaning: "很感兴趣", exampleEn: "He takes very much interest in science.", exampleCn: "他对科学很感兴趣。", phonetic: "/teɪk ˈveri mʌtʃ ˈɪntrəst ɪn/", category: "phrase", source: "TRAINER1TEST5" },
+            { word: "psychology", meaning: "心理学", exampleEn: "She is studying psychology at university.", exampleCn: "她在大学学习心理学。", phonetic: "/saɪˈkɒlədʒi/", category: "noun", source: "TRAINER1TEST5" },
+            { word: "responsible", meaning: "负责", exampleEn: "Who is responsible for this project?", exampleCn: "谁负责这个项目？", phonetic: "/rɪˈspɒnsəbl/", category: "adj", source: "TRAINER1TEST5" },
+            { word: "Be reasonable", meaning: "合理", exampleEn: "Please be reasonable about this.", exampleCn: "请对此事保持合理。", phonetic: "/biː ˈriːznəbl/", category: "phrase", source: "TRAINER1TEST5" },
+            { word: "Had problem finding the time", meaning: "很难抽时间", exampleEn: "I had problem finding the time to finish the report.", exampleCn: "我很难抽出时间来完成报告。", phonetic: "/hæd ˈprɒbləm ˈfaɪndɪŋ ðə taɪm/", category: "phrase", source: "TRAINER1TEST5" },
+            { word: "Put off calling people", meaning: "拖延打电话，不愿意（打电话）", exampleEn: "I keep putting off calling people because I don't like talking on the phone.", exampleCn: "我一直拖延打电话，因为我不喜欢在电话里交谈。", phonetic: "/pʊt ɒf ˈkɔːlɪŋ ˈpiːpl/", category: "phrase", source: "TRAINER1TEST5" },
+            { word: "pedestrian", meaning: "行人", exampleEn: "Pedestrians should use the crosswalk.", exampleCn: "行人应该走人行横道。", phonetic: "/pəˈdestriən/", category: "noun", source: "TRAINER1TEST5" },
+            { word: "Extremely effective", meaning: "极其有效", exampleEn: "This medicine is extremely effective.", exampleCn: "这种药极其有效。", phonetic: "/ɪkˈstriːmli ɪˈfektɪv/", category: "phrase", source: "TRAINER1TEST5" },
+            { word: "Require a high level of skill", meaning: "需要高技能要求", exampleEn: "This job requires a high level of skill.", exampleCn: "这份工作需要高技能要求。", phonetic: "/rɪˈkwaɪər ə haɪ ˈlevl əv skɪl/", category: "phrase", source: "TRAINER1TEST5" },
+            { word: "Require a low level of skill", meaning: "需要低技能", exampleEn: "This task requires a low level of skill.", exampleCn: "这个任务需要低技能。", phonetic: "/rɪˈkwaɪər ə ləʊ ˈlevl əv skɪl/", category: "phrase", source: "TRAINER1TEST5" },
+            { word: "calm", meaning: "冷静，安静", exampleEn: "Please stay calm in an emergency.", exampleCn: "在紧急情况下请保持冷静。", phonetic: "/kɑːm/", category: "adj", source: "TRAINER1TEST5" },
+            { word: "Previous", meaning: "之前的", exampleEn: "In my previous job, I was a teacher.", exampleCn: "在我之前的工作中，我是一名教师。", phonetic: "/ˈpriːviəs/", category: "adj", source: "TRAINER1TEST5" },
+            { word: "secretary", meaning: "秘书", exampleEn: "The secretary answered the phone.", exampleCn: "秘书接了电话。", phonetic: "/ˈsekrətri/", category: "noun", source: "TRAINER1TEST5" },
+            { word: "ignore", meaning: "忽视", exampleEn: "Don't ignore the warning signs.", exampleCn: "不要忽视警告信号。", phonetic: "/ɪɡˈnɔː(r)/", category: "verb", source: "TRAINER1TEST5" },
+            { word: "permitted", meaning: "被允许", exampleEn: "Smoking is not permitted here.", exampleCn: "此处不允许吸烟。", phonetic: "/pəˈmɪtɪd/", category: "verb", source: "TRAINER1TEST5" },
+            { word: "Proper food", meaning: "正确的合适的食物", exampleEn: "Children need proper food to grow.", exampleCn: "儿童需要合适的食物来成长。", phonetic: "/ˈprɒpə(r) fuːd/", category: "phrase", source: "TRAINER1TEST5" },
+            { word: "earring", meaning: "耳环", exampleEn: "She lost one of her earrings.", exampleCn: "她丢了一只耳环。", phonetic: "/ˈɪərɪŋ/", category: "noun", source: "TRAINER1TEST5" },
+            { word: "heating", meaning: "加热系统", exampleEn: "The heating is not working properly.", exampleCn: "加热系统工作不正常。", phonetic: "/ˈhiːtɪŋ/", category: "noun", source: "TRAINER1TEST5" },
+            { word: "Since then", meaning: "从那时候开始", exampleEn: "Since then, I have been more careful.", exampleCn: "从那时候开始，我更加小心了。", phonetic: "/sɪns ðen/", category: "phrase", source: "TRAINER1TEST5" },
+            { word: "Put away", meaning: "放一边去", exampleEn: "Put away your toys when you finish playing.", exampleCn: "玩完后把你的玩具收起来。", phonetic: "/pʊt əˈweɪ/", category: "phrase", source: "TRAINER1TEST5" },
+            { word: "Bring huge benefits", meaning: "带来巨大好处", exampleEn: "Exercise brings huge benefits to your health.", exampleCn: "锻炼给你的健康带来巨大好处。", phonetic: "/brɪŋ hjuːdʒ ˈbenɪfɪts/", category: "phrase", source: "TRAINER1TEST5" },
+            { word: "Spend time doing", meaning: "花费时间做", exampleEn: "I spend time doing my homework every day.", exampleCn: "我每天花时间做作业。", phonetic: "/spend taɪm ˈduːɪŋ/", category: "phrase", source: "TRAINER1TEST5" },
+            { word: "Character", meaning: "角色，人物", exampleEn: "He played the main character in the film.", exampleCn: "他在电影中扮演主要角色。", phonetic: "/ˈkærəktə(r)/", category: "noun", source: "TRAINER1TEST5" },
+            { word: "Connect with", meaning: "联系", exampleEn: "It's important to connect with people.", exampleCn: "与人联系很重要。", phonetic: "/kəˈnekt wɪð/", category: "phrase", source: "TRAINER1TEST5" },
+            { word: "journalism", meaning: "新闻，记者（行业）", exampleEn: "She studied journalism at university.", exampleCn: "她在大学学习新闻学。", phonetic: "/ˈdʒɜːnəlɪzəm/", category: "noun", source: "TRAINER1TEST5" },
+            { word: "effort", meaning: "努力", exampleEn: "With effort, you can achieve anything.", exampleCn: "通过努力，你可以实现任何事。", phonetic: "/ˈefət/", category: "noun", source: "TRAINER1TEST5" },
+            { word: "editor", meaning: "编辑", exampleEn: "The editor checked the article for mistakes.", exampleCn: "编辑检查文章是否有错误。", phonetic: "/ˈedɪtə(r)/", category: "noun", source: "TRAINER1TEST5" },
+            { word: "occasionally", meaning: "偶尔", exampleEn: "I occasionally go to the cinema.", exampleCn: "我偶尔去电影院。", phonetic: "/əˈkeɪʒnəli/", category: "adv", source: "TRAINER1TEST5" },
+            { word: "bay", meaning: "海湾", exampleEn: "We went swimming in the bay.", exampleCn: "我们去海湾游泳。", phonetic: "/beɪ/", category: "noun", source: "TRAINER1TEST5" },
+            { word: "sunbath", meaning: "日光浴", exampleEn: "She likes to have a sunbath on the beach.", exampleCn: "她喜欢在海滩上做日光浴。", phonetic: "/ˈsʌnbɑːθ/", category: "noun", source: "TRAINER1TEST5" },
+            { word: "Show much interest in", meaning: "展现兴趣", exampleEn: "He shows much interest in science.", exampleCn: "他对科学表现出很大的兴趣。", phonetic: "/ʃəʊ mʌtʃ ˈɪntrəst ɪn/", category: "phrase", source: "TRAINER1TEST5" },
+            
+            // Page 12 - 第二部分
+            { word: "remain", meaning: "保存", exampleEn: "These ancient ruins remain from Roman times.", exampleCn: "这些古代遗迹是从罗马时代保存下来的。", phonetic: "/rɪˈmeɪn/", category: "verb", source: "PET词汇表" },
+            { word: "Provide", meaning: "提供", exampleEn: "The company will provide training for new employees.", exampleCn: "公司将为新员工提供培训。", phonetic: "/prəˈvaɪd/", category: "verb", source: "PET词汇表" },
+            { word: "remind", meaning: "提醒", exampleEn: "Remind me to buy milk on the way home.", exampleCn: "提醒我在回家的路上买牛奶。", phonetic: "/rɪˈmaɪnd/", category: "verb", source: "PET词汇表" },
+            { word: "request", meaning: "需求", exampleEn: "I have a request to make.", exampleCn: "我有一个请求。", phonetic: "/rɪˈkwest/", category: "noun", source: "PET词汇表" },
+            { word: "plus", meaning: "额外", exampleEn: "The hotel room costs £100 per night, plus breakfast.", exampleCn: "酒店房间每晚100英镑，外加早餐。", phonetic: "/plʌs/", category: "preposition", source: "PET词汇表" },
+            { word: "argument", meaning: "吵架", exampleEn: "They had an argument about money.", exampleCn: "他们就钱的问题吵了一架。", phonetic: "/ˈɑːɡjumənt/", category: "noun", source: "PET词汇表" },
+            { word: "proper", meaning: "合适的", exampleEn: "Make sure you wear proper shoes for hiking.", exampleCn: "确保你穿合适的鞋子去远足。", phonetic: "/ˈprɒpə(r)/", category: "adj", source: "PET词汇表" },
+            { word: "accurate", meaning: "精确的", exampleEn: "The information must be accurate.", exampleCn: "信息必须准确。", phonetic: "/ˈækjərət/", category: "adj", source: "PET词汇表" },
+            { word: "set up", meaning: "建立", exampleEn: "They set up a new company last year.", exampleCn: "他们去年建立了一家新公司。", phonetic: "/set ʌp/", category: "phrase", source: "PET词汇表" },
+            { word: "exact", meaning: "一样", exampleEn: "I need the exact same book.", exampleCn: "我需要完全一样的书。", phonetic: "/ɪɡˈzækt/", category: "adj", source: "PET词汇表" },
+            { word: "follow the latest trend", meaning: "跟随最新趋势", exampleEn: "She likes to follow the latest fashion trends.", exampleCn: "她喜欢追随最新的时尚潮流。", phonetic: "/ˈfɒləʊ ðə ˈleɪtɪst trend/", category: "phrase", source: "PET词汇表" },
+            { word: "record", meaning: "记录", exampleEn: "The thermometer recorded a temperature of 30°C.", exampleCn: "温度计记录的温度为30°C。", phonetic: "/ˈrekɔːd/", category: "verb", source: "PET词汇表" },
+            { word: "promise", meaning: "承诺", exampleEn: "I promise to help you with your homework.", exampleCn: "我承诺帮你做作业。", phonetic: "/ˈprɒmɪs/", category: "verb/noun", source: "PET词汇表" },
+            { word: "hut", meaning: "小屋", exampleEn: "We stayed in a small hut in the forest.", exampleCn: "我们住在森林里的一间小屋里。", phonetic: "/hʌt/", category: "noun", source: "PET词汇表" },
+            { word: "research", meaning: "研究调查", exampleEn: "He is doing research on climate change.", exampleCn: "他正在做关于气候变化的研究。", phonetic: "/rɪˈsɜːtʃ/", category: "noun", source: "PET词汇表" },
+            { word: "recipe", meaning: "菜谱", exampleEn: "This recipe is easy to follow.", exampleCn: "这个菜谱很容易遵循。", phonetic: "/ˈresəpi/", category: "noun", source: "PET词汇表" },
+            { word: "teens", meaning: "青少年", exampleEn: "The film is popular with teens.", exampleCn: "这部电影在青少年中很受欢迎。", phonetic: "/tiːnz/", category: "noun", source: "PET词汇表" },
+            { word: "a selection of books", meaning: "一系列精选书籍", exampleEn: "The library has a good selection of books.", exampleCn: "图书馆有很好的精选书籍。", phonetic: "/ə sɪˈlekʃn əv bʊks/", category: "phrase", source: "PET词汇表" },
+            { word: "message", meaning: "发消息", exampleEn: "I'll message you later.", exampleCn: "我稍后给你发消息。", phonetic: "/ˈmesɪdʒ/", category: "verb", source: "PET词汇表" },
+            { word: "more than anything", meaning: "最重要的", exampleEn: "More than anything, I want to be happy.", exampleCn: "最重要的是，我想要快乐。", phonetic: "/mɔː(r) ðæn ˈeniθɪŋ/", category: "phrase", source: "PET词汇表" },
+            { word: "original", meaning: "原创", exampleEn: "This is an original painting by Picasso.", exampleCn: "这是毕加索的原创画作。", phonetic: "/əˈrɪdʒənl/", category: "adj", source: "PET词汇表" },
+            { word: "willing to", meaning: "喜欢（做）", exampleEn: "I'm willing to help you with your project.", exampleCn: "我愿意帮你做你的项目。", phonetic: "/ˈwɪlɪŋ tuː/", category: "phrase", source: "PET词汇表" },
+            { word: "after all", meaning: "毕竟", exampleEn: "After all, we are friends.", exampleCn: "毕竟，我们是朋友。", phonetic: "/ˈɑːftər ɔːl/", category: "phrase", source: "PET词汇表" },
+            { word: "calligraphy", meaning: "书法", exampleEn: "She is learning Chinese calligraphy.", exampleCn: "她正在学习中国书法。", phonetic: "/kəˈlɪɡrəfi/", category: "noun", source: "PET词汇表" },
+            { word: "take up", meaning: "开始从事，学习", exampleEn: "I decided to take up photography as a hobby.", exampleCn: "我决定开始学习摄影作为爱好。", phonetic: "/teɪk ʌp/", category: "phrase", source: "PET词汇表" }
+        ];
+
+        // 应用状态
+        let currentCardIndex = 0;
+        let favorites = JSON.parse(localStorage.getItem('petFlashcardFavorites')) || [];
+        let filteredWordList = [...wordList];
+        let currentCategory = 'all';
+        
+        // DOM 元素
+        const flashcard = document.getElementById('flashcard');
+        const wordFront = document.getElementById('word-front');
+        const phonetic = document.getElementById('phonetic');
+        const meaningBack = document.getElementById('meaning-back');
+        const exampleEn = document.getElementById('example-en');
+        const exampleCn = document.getElementById('example-cn');
+        const source = document.getElementById('source');
+        const favoriteBtn = document.getElementById('favorite-btn');
+        const pronounceBtn = document.getElementById('pronounce-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const flipBtn = document.getElementById('flip-btn');
+        const randomBtn = document.getElementById('random-btn');
+        const shuffleBtn = document.getElementById('shuffle-btn');
+        const viewFavoritesBtn = document.getElementById('view-favorites-btn');
+        const favoritesModal = document.getElementById('favorites-modal');
+        const closeModal = document.getElementById('close-modal');
+        const favoritesList = document.getElementById('favorites-list');
+        const emptyFavorites = document.getElementById('empty-favorites');
+        const currentCardSpan = document.getElementById('current-card');
+        const totalCardsSpan = document.getElementById('total-cards');
+        const favoritesCountSpan = document.getElementById('favorites-count');
+        const cardNumber = document.getElementById('card-number');
+        const searchInput = document.getElementById('search-input');
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const progressPercent = document.getElementById('progress-percent');
+        
+        // 初始化
+        function init() {
+            totalCardsSpan.textContent = wordList.length;
+            updateCard();
+            updateFavoritesCount();
+            updateProgress();
+            
+            // 键盘导航
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'ArrowLeft') {
+                    prevCard();
+                } else if (event.key === 'ArrowRight') {
+                    nextCard();
+                } else if (event.key === ' ' || event.key === 'Spacebar') {
+                    flipCard();
+                    event.preventDefault();
+                } else if (event.key === 'r' || event.key === 'R') {
+                    randomCard();
+                }
+            });
+            
+            // 点击卡片任意位置翻转
+            flashcard.addEventListener('click', function(event) {
+                // 如果不是点击按钮，则翻转卡片
+                if (!event.target.closest('.favorite-btn') && !event.target.closest('.pronounce-btn')) {
+                    flipCard();
+                }
+            });
+            
+            // 搜索功能
+            searchInput.addEventListener('input', function() {
+                filterCards();
+            });
+            
+            // 分类过滤
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    categoryButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    currentCategory = this.getAttribute('data-category');
+                    filterCards();
+                });
+            });
+        }
+        
+        // 更新卡片内容
+        function updateCard() {
+            const currentWord = filteredWordList[currentCardIndex];
+            wordFront.textContent = currentWord.word;
+            phonetic.textContent = currentWord.phonetic;
+            meaningBack.textContent = currentWord.meaning;
+            exampleEn.textContent = currentWord.exampleEn;
+            exampleCn.textContent = currentWord.exampleCn;
+            source.textContent = `来源: ${currentWord.source}`;
+            
+            // 更新卡片编号
+            currentCardSpan.textContent = currentCardIndex + 1;
+            cardNumber.textContent = `${currentCardIndex + 1}/${filteredWordList.length}`;
+            
+            // 更新收藏按钮状态
+            const originalIndex = wordList.findIndex(item => item.word === currentWord.word);
+            const isFavorite = favorites.includes(originalIndex);
+            favoriteBtn.classList.toggle('active', isFavorite);
+            favoriteBtn.innerHTML = isFavorite ? '<i class="fas fa-heart"></i>' : '<i class="far fa-heart"></i>';
+            
+            // 确保卡片显示正面
+            flashcard.classList.remove('flipped');
+            
+            // 更新进度
+            updateProgress();
+        }
+        
+        // 更新学习进度
+        function updateProgress() {
+            const total = wordList.length;
+            const studied = favorites.length;
+            const percent = Math.round((studied / total) * 100);
+            progressBar.style.width = `${percent}%`;
+            progressPercent.textContent = `${percent}%`;
+        }
+        
+        // 翻转到下一张卡片
+        function nextCard() {
+            currentCardIndex = (currentCardIndex + 1) % filteredWordList.length;
+            updateCard();
+        }
+        
+        // 翻转到上一张卡片
+        function prevCard() {
+            currentCardIndex = (currentCardIndex - 1 + filteredWordList.length) % filteredWordList.length;
+            updateCard();
+        }
+        
+        // 随机卡片
+        function randomCard() {
+            if (filteredWordList.length === 0) return;
+            
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * filteredWordList.length);
+            } while (newIndex === currentCardIndex && filteredWordList.length > 1);
+            
+            currentCardIndex = newIndex;
+            updateCard();
+        }
+        
+        // 乱序播放
+        function shuffleCards() {
+            // 洗牌算法
+            for (let i = filteredWordList.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [filteredWordList[i], filteredWordList[j]] = [filteredWordList[j], filteredWordList[i]];
+            }
+            currentCardIndex = 0;
+            updateCard();
+            alert('卡片已随机排序！');
+        }
+        
+        // 翻转卡片
+        function flipCard() {
+            flashcard.classList.toggle('flipped');
+        }
+        
+        // 发音功能
+        function pronounceWord() {
+            const currentWord = filteredWordList[currentCardIndex].word;
+            // 简单的发音实现 - 使用Web Speech API
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(currentWord);
+                utterance.lang = 'en-GB'; // 英式发音
+                utterance.rate = 0.8;
+                speechSynthesis.speak(utterance);
+            } else {
+                alert("您的浏览器不支持语音合成功能，请尝试使用Chrome或Edge浏览器。");
+            }
+        }
+        
+        // 切换收藏状态
+        function toggleFavorite() {
+            const currentWord = filteredWordList[currentCardIndex];
+            const originalIndex = wordList.findIndex(item => item.word === currentWord.word);
+            
+            const index = favorites.indexOf(originalIndex);
+            if (index === -1) {
+                // 添加到收藏
+                favorites.push(originalIndex);
+                favoriteBtn.innerHTML = '<i class="fas fa-heart"></i>';
+                favoriteBtn.classList.add('active');
+            } else {
+                // 从收藏中移除
+                favorites.splice(index, 1);
+                favoriteBtn.innerHTML = '<i class="far fa-heart"></i>';
+                favoriteBtn.classList.remove('active');
+            }
+            
+            // 保存到本地存储
+            localStorage.setItem('petFlashcardFavorites', JSON.stringify(favorites));
+            updateFavoritesCount();
+            updateProgress();
+        }
+        
+        // 更新收藏计数
+        function updateFavoritesCount() {
+            favoritesCountSpan.textContent = favorites.length;
+        }
+        
+        // 过滤卡片
+        function filterCards() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            
+            filteredWordList = wordList.filter(item => {
+                // 分类过滤
+                if (currentCategory !== 'all' && item.category !== currentCategory) {
+                    return false;
+                }
+                
+                // 搜索过滤
+                if (searchTerm) {
+                    return item.word.toLowerCase().includes(searchTerm) || 
+                           item.meaning.toLowerCase().includes(searchTerm) ||
+                           (item.exampleEn && item.exampleEn.toLowerCase().includes(searchTerm));
+                }
+                
+                return true;
+            });
+            
+            // 重置当前索引
+            currentCardIndex = 0;
+            
+            // 更新总卡片数
+            totalCardsSpan.textContent = filteredWordList.length;
+            
+            // 更新卡片
+            if (filteredWordList.length > 0) {
+                updateCard();
+            } else {
+                wordFront.textContent = "未找到匹配的单词";
+                phonetic.textContent = "";
+                meaningBack.textContent = "请尝试不同的搜索词";
+                exampleEn.textContent = "No matching words found";
+                exampleCn.textContent = "未找到匹配的单词";
+                cardNumber.textContent = "0/0";
+                currentCardSpan.textContent = "0";
+                source.textContent = "";
+            }
+        }
+        
+        // 显示收藏夹
+        function showFavorites() {
+            // 清空列表
+            favoritesList.innerHTML = '';
+            
+            if (favorites.length === 0) {
+                emptyFavorites.style.display = 'block';
+            } else {
+                emptyFavorites.style.display = 'none';
+                
+                // 按收藏顺序显示
+                favorites.forEach(favIndex => {
+                    const word = wordList[favIndex];
+                    const listItem = document.createElement('li');
+                    listItem.className = 'favorite-item';
+                    listItem.innerHTML = `
+                        <div>
+                            <div class="favorite-word">${word.word}</div>
+                            <div class="favorite-meaning">${word.meaning}</div>
+                            <div class="phonetic" style="font-size:0.9rem;margin-top:3px;">${word.phonetic}</div>
+                        </div>
+                        <div>
+                            <button class="remove-btn" data-index="${favIndex}">移除</button>
+                        </div>
+                    `;
+                    favoritesList.appendChild(listItem);
+                });
+                
+                // 为移除按钮添加事件监听器
+                document.querySelectorAll('.remove-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const indexToRemove = parseInt(this.getAttribute('data-index'));
+                        removeFromFavorites(indexToRemove);
+                    });
+                });
+            }
+            
+            favoritesModal.style.display = 'flex';
+        }
+        
+        // 从收藏夹移除
+        function removeFromFavorites(index) {
+            const favIndex = favorites.indexOf(index);
+            if (favIndex !== -1) {
+                favorites.splice(favIndex, 1);
+                localStorage.setItem('petFlashcardFavorites', JSON.stringify(favorites));
+                updateFavoritesCount();
+                updateProgress();
+                
+                // 如果当前卡片是收藏状态，更新按钮
+                const currentWord = filteredWordList[currentCardIndex];
+                if (currentWord && wordList[index].word === currentWord.word) {
+                    favoriteBtn.innerHTML = '<i class="far fa-heart"></i>';
+                    favoriteBtn.classList.remove('active');
+                }
+                
+                // 重新显示收藏夹
+                showFavorites();
+            }
+        }
+        
+        // 事件监听器
+        favoriteBtn.addEventListener('click', function(event) {
+            event.stopPropagation();
+            toggleFavorite();
+        });
+        
+        pronounceBtn.addEventListener('click', function(event) {
+            event.stopPropagation();
+            pronounceWord();
+        });
+        
+        prevBtn.addEventListener('click', function(event) {
+            event.stopPropagation();
+            prevCard();
+        });
+        
+        nextBtn.addEventListener('click', function(event) {
+            event.stopPropagation();
+            nextCard();
+        });
+        
+        flipBtn.addEventListener('click', function(event) {
+            event.stopPropagation();
+            flipCard();
+        });
+        
+        randomBtn.addEventListener('click', function(event) {
+            event.stopPropagation();
+            randomCard();
+        });
+        
+        shuffleBtn.addEventListener('click', function(event) {
+            event.stopPropagation();
+            shuffleCards();
+        });
+        
+        viewFavoritesBtn.addEventListener('click', showFavorites);
+        
+        closeModal.addEventListener('click', function() {
+            favoritesModal.style.display = 'none';
+        });
+        
+        // 点击模态框外部关闭
+        window.addEventListener('click', function(event) {
+            if (event.target === favoritesModal) {
+                favoritesModal.style.display = 'none';
+            }
+        });
+        
+        // 初始化应用
+        init();
+    </script>
+</body>
+</html>
